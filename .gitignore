@@ -1,21 +1,16 @@
-# Node modules
+# dependencies
 node_modules/
 
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Environment variables
+# environment files
 .env
 
-# Database file (local JSON storage)
-data/db.json
+# uploads & cache
+uploads/
+*.log
 
-# OS files
+# OS/system files
 .DS_Store
 Thumbs.db
 
-# Build cache
-*.cache
+# database JSON
+data/db.json
