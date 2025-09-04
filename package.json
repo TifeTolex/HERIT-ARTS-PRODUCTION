@@ -1,0 +1,26 @@
+{
+  "name": "content-ad-website-starter",
+  "version": "1.0.0",
+  "description": "Starter kit for a content advertisement website (brand + production team)",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "cross-env NODE_ENV=production node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.0",
+    "uuid": "^9.0.1",
+    "cross-env": "^7.0.3"
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "license": "MIT",
+  "author": "Your Name"
+}

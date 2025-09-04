@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Content Advertisement Platform</title>
+  <meta name="description" content="Subscribe to professional content creation. Submit briefs, track projects, and review deliveries." />
+  <meta property="og:title" content="Content Advertisement Platform" />
+  <meta property="og:description" content="A simple platform for brands to submit briefs and get content delivered." />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header>
+    <nav class="container">
+      <div class="logo">
+        <img src="assets/logo-placeholder.svg" alt="Content Ads" width="28" height="28" />
+        <span>Content Ads</span>
+      </div>
+      <div>
+        <a href="login.html">Login</a>
+        <a href="signup.html" class="btn">Get Started</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" class="container">
+    <section class="grid cols-2 mt-3">
+      <div>
+        <h1>H'Art PRoduction </h1>
+        <p class="text-muted">Create a brief, pick a plan, and receive ready-to-use content from our production team.</p>
+        <div class="mt-2">
+          <a href="signup.html" class="btn">Create your brand account</a>
+          <a href="login.html" class="btn ghost">I already have an account</a>
+        </div>
+        <ul class="mt-2">
+          <li>Structured briefs capture goals, tone, audience, and assets.</li>
+          <li>Dashboard shows active and queued projects.</li>
+          <li>Review and approve delivered content.</li>
+          <li>Invite teammates and manage roles.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>What’s inside</h3>
+        <ul>
+          <li>Subscriptions & payments</li>
+          <li>Project intake & asset uploads</li>
+          <li>Production workflow & delivery</li>
+          <li>Analytics for brands & staff</li>
+        </ul>
+        <p class="mt-1"><a class="btn" href="subscriptions.html">View plans</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer center">
+    © <span id="year"></span> Content Ads — All rights reserved.
+  </footer>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

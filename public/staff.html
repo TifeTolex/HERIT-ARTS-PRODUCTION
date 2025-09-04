@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Production Dashboard — Content Ads</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="staff-dashboard">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header>
+    <nav class="container">
+      <div class="logo">
+        <img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" />
+        <span>Content Ads</span>
+      </div>
+      <div>
+        <a href="staff.html" aria-current="page">Production</a>
+        <a href="staff-brand.html">Brands</a>
+        <a href="analytics.html">Analytics</a>
+        <button class="btn ghost" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+  </header>
+  <main id="main" class="container">
+    <h1>Production Team</h1>
+
+    <section class="card">
+      <div class="form-row inline">
+        <button id="loadBtn" class="btn">Load projects</button>
+        <input id="search" placeholder="Search projects..." />
+      </div>
+      <div class="grid cols-3 mt-2" id="columns">
+        <div>
+          <h3>New requests</h3>
+          <div id="col-new" class="stack"></div>
+        </div>
+        <div>
+          <h3>In Progress</h3>
+          <div id="col-progress" class="stack"></div>
+        </div>
+        <div>
+          <h3>Delivered</h3>
+          <div id="col-delivered" class="stack"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Load all staff logic from staff.js -->
+  <script type="module" src="js/staff.js"></script>
+</body>
+</html>

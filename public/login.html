@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login — Content Ads</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Hide reset form by default */
+    #resetCard { display: none; }
+  </style>
+</head>
+<body data-page="login">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header>
+    <nav class="container">
+      <div class="logo">
+        <img src="assets/logo-placeholder.svg" alt="" width="28" height="28" />
+        <span>Content Ads</span>
+      </div>
+      <div>
+        <a href="index.html">Home</a>
+        <a href="signup.html">Signup</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" class="container">
+    <h1>Welcome back</h1>
+    <div class="grid cols-2 mt-2">
+      <!-- LOGIN FORM -->
+      <form id="loginForm" class="card" aria-describedby="loginHelp">
+        <div class="form-row inline">
+          <label>Role
+            <select id="role">
+              <option value="brand">Brand</option>
+              <option value="staff">Staff</option>
+            </select>
+          </label>
+        </div>
+        <div id="loginHelp" class="text-muted">
+          Use staff@example.com / staff123 for staff role demo.
+        </div>
+        <div class="form-row">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required autocomplete="email" />
+        </div>
+        <div class="form-row">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required autocomplete="current-password" />
+        </div>
+        <button class="btn" type="submit">Login</button>
+        <button class="btn ghost" type="button" id="forgotBtn">Forgot password</button>
+      </form>
+
+      <!-- RESET FORM (hidden until triggered) -->
+      <div id="resetCard" class="card fade-in">
+        <h3>Reset password</h3>
+        <form id="resetForm">
+          <div class="form-row">
+            <label for="rpEmail">Email</label>
+            <input id="rpEmail" type="email" required />
+          </div>
+          <div class="form-row">
+            <label for="rpCode">OTP Code</label>
+            <input id="rpCode" type="text" placeholder="e.g. 123456" />
+          </div>
+          <div class="form-row">
+            <label for="rpNew">New password</label>
+            <input id="rpNew" type="password" />
+          </div>
+          <button class="btn" type="submit">Reset</button>
+          <button class="btn ghost mt-1" type="button" id="backBtn">Back to login</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="js/auth.js"></script>
+  <script>
+    // Toggle between login and reset forms
+    const loginForm = document.getElementById('loginForm');
+    const resetCard = document.getElementById('resetCard');
+    document.getElementById('forgotBtn').addEventListener('click', ()=>{
+      loginForm.style.display = 'none';
+      resetCard.style.display = 'block';
+    });
+    document.getElementById('backBtn').addEventListener('click', ()=>{
+      resetCard.style.display = 'none';
+      loginForm.style.display = 'block';
+    });
+  </script>
+</body>
+</html>

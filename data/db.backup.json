@@ -1,0 +1,169 @@
+{
+  "users": [
+    {
+      "id": "00e39954-315c-4830-9df3-769cf6cceb6d",
+      "email": "staff@example.com",
+      "passwordHash": "$2a$10$vh4Bls7anoQHphpy.y5qsubktNi5aIKGQPQVwsUjZRLZlVy6J2Zcq",
+      "firstName": "Staff",
+      "lastName": "User",
+      "role": "staff",
+      "createdAt": "2025-08-27T12:19:41.613Z"
+    },
+    {
+      "id": "f6c4b4cc-bfb7-42cf-9db4-028903bd52ae",
+      "email": "olarogbatiolu@gmail.com",
+      "passwordHash": "$2a$10$wLXyipjK3dxna.MVZV25sumK7094wi6qSiN8cF3kvw.264qtWrepu",
+      "firstName": "olarogba",
+      "lastName": "toluwanio",
+      "role": "brand",
+      "createdAt": "2025-08-27T12:20:19.991Z"
+    },
+    {
+      "id": "58c4a797-49cd-4d00-b1f1-39907652e802",
+      "email": "olarogbatiolu@gmail.co",
+      "passwordHash": "$2a$10$4ca8p18xmVK0e5ClQNAN5OwmO54f32lqmf0YqsDxMiBbq0vFLW2NC",
+      "firstName": "olarogba",
+      "lastName": "toluwani",
+      "role": "brand",
+      "createdAt": "2025-08-27T12:21:58.087Z"
+    },
+    {
+      "id": "f9e31eb4-6a53-4b36-bcd7-90a4ab3ecf82",
+      "email": "sample@gmail.com",
+      "passwordHash": "$2a$10$7VQegIT6NqK/lyqW73kkf.8FpzWNvdC0DiQEDD19yn1Huu76EJkK2",
+      "firstName": "olarogba",
+      "lastName": "toluwani",
+      "role": "brand",
+      "createdAt": "2025-08-27T13:49:17.702Z"
+    }
+  ],
+  "brands": [
+    {
+      "id": "7e200598-140f-42cb-a326-9cd55d1d1039",
+      "userId": "f6c4b4cc-bfb7-42cf-9db4-028903bd52ae",
+      "firstName": "olarogba",
+      "lastName": "toluwanio",
+      "businessName": "jjwjw",
+      "industry": "Education",
+      "logoUrl": "",
+      "colorCodes": [],
+      "createdAt": "2025-08-27T12:20:20.009Z"
+    },
+    {
+      "id": "83f648bb-2b33-4d53-9b71-12d642953108",
+      "userId": "58c4a797-49cd-4d00-b1f1-39907652e802",
+      "firstName": "olarogba",
+      "lastName": "toluwani",
+      "businessName": "fashion brand",
+      "industry": "Technology",
+      "logoUrl": "",
+      "colorCodes": [],
+      "createdAt": "2025-08-27T12:21:58.119Z"
+    },
+    {
+      "id": "8d712534-c2f1-454e-aaf3-c85cf8e795f4",
+      "userId": "f9e31eb4-6a53-4b36-bcd7-90a4ab3ecf82",
+      "firstName": "olarogba",
+      "lastName": "toluwani",
+      "businessName": "new business",
+      "industry": "Fashion",
+      "logoUrl": "",
+      "colorCodes": [],
+      "createdAt": "2025-08-27T13:49:17.724Z"
+    }
+  ],
+  "projects": [
+    {
+      "id": "49c40b44-0d0d-4fca-ae73-81fada63d495",
+      "ownerId": "58c4a797-49cd-4d00-b1f1-39907652e802",
+      "name": "new project",
+      "contentType": "Film & Video Advertising",
+      "deadline": null,
+      "keyFeatures": "",
+      "targetAudience": [],
+      "toneOfVoice": [],
+      "usage": [],
+      "primaryGoal": "",
+      "notes": "",
+      "files": [],
+      "createdAt": "2025-08-27T12:22:17.332Z",
+      "status": "Pending"
+    },
+    {
+      "id": "8a6c0405-fac0-424c-a0a7-6f1685be5de9",
+      "ownerId": "58c4a797-49cd-4d00-b1f1-39907652e802",
+      "name": "new project",
+      "contentType": "Stage & Live Band Activations",
+      "deadline": "32220-02-20",
+      "keyFeatures": "scam",
+      "targetAudience": [
+        {
+          "name": "young people",
+          "description": ""
+        }
+      ],
+      "toneOfVoice": [
+        "playful"
+      ],
+      "usage": [
+        "instagram"
+      ],
+      "primaryGoal": "adverts",
+      "notes": "love God",
+      "files": [],
+      "createdAt": "2025-08-27T12:22:55.961Z",
+      "status": "Pending"
+    },
+    {
+      "id": "4a2772de-e3d6-4768-a1fb-6965022f7d65",
+      "ownerId": "58c4a797-49cd-4d00-b1f1-39907652e802",
+      "name": "atanda",
+      "contentType": "Digital & Social Media Content",
+      "deadline": "2025-08-22",
+      "keyFeatures": "games",
+      "targetAudience": [
+        {
+          "name": "students",
+          "description": ""
+        }
+      ],
+      "toneOfVoice": [
+        "playful"
+      ],
+      "usage": [
+        "tiktok"
+      ],
+      "primaryGoal": "awareness",
+      "notes": "",
+      "files": [],
+      "createdAt": "2025-08-27T13:39:44.422Z",
+      "status": "Pending"
+    },
+    {
+      "id": "b5c7bdef-9e8b-4c46-8860-dc9ab31bad1b",
+      "ownerId": "f9e31eb4-6a53-4b36-bcd7-90a4ab3ecf82",
+      "name": "new project",
+      "contentType": "Others",
+      "deadline": "2025-08-29",
+      "keyFeatures": "sample",
+      "targetAudience": [
+        {
+          "name": "students",
+          "description": ""
+        }
+      ],
+      "toneOfVoice": [
+        "professional"
+      ],
+      "usage": [
+        "tiktok and others"
+      ],
+      "primaryGoal": "awareness",
+      "notes": "tithes and offering",
+      "files": [],
+      "createdAt": "2025-08-27T13:50:28.049Z",
+      "status": "Pending"
+    }
+  ],
+  "otps": []
+}

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Team — Content Ads</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="brand-team">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header>
+    <nav class="container">
+      <div class="logo"><img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" /><span>Content Ads</span></div>
+      <div>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="projects.html">Projects</a>
+        <a href="team.html" aria-current="page">Team</a>
+        <button class="btn ghost" id="logoutBtn">Logout</button>
+      </div>
+    </nav>
+  </header>
+  <main id="main" class="container">
+    <h1>Invite team members</h1>
+    <div class="card">
+      <div class="form-row">
+        <label for="inviteEmail">Email address</label>
+        <input id="inviteEmail" type="email" placeholder="teammate@example.com" />
+      </div>
+      <button id="inviteBtn" class="btn">Invite (demo)</button>
+      <p class="text-muted mt-1">Demo only: this stores the email in your brand profile.</p>
+    </div>
+    <div class="card mt-2">
+      <h2>Members</h2>
+      <ul id="members"></ul>
+    </div>
+    <div class="card mt-2">
+      <h2>Manage roles</h2>
+      <div class="form-row inline">
+        <input id="memberEmail" placeholder="member email" />
+        <select id="memberRole">
+          <option>Viewer</option>
+          <option>Editor</option>
+          <option>Admin</option>
+        </select>
+        <button id="setRoleBtn" class="btn">Set role</button>
+        <button id="removeBtn" class="btn ghost">Remove</button>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { api, requireAuthOrRedirect, logout, showToast } from '/js/utils.js';
+    requireAuthOrRedirect();
+    document.getElementById('logoutBtn')?.addEventListener('click', logout);
+
+    const membersEl = document.getElementById('members');
+    const inviteBtn = document.getElementById('inviteBtn');
+    const setRoleBtn = document.getElementById('setRoleBtn');
+    const removeBtn = document.getElementById('removeBtn');
+
+    async function loadMembers(){
+      try {
+        const { brand } = await api('/api/brands/me');
+        const members = brand.members || [];
+        membersEl.innerHTML = members.length
+          ? members.map(m => `<li>${m.email} — ${m.role || 'Viewer'}</li>`).join('')
+          : '<li class="text-muted">No members yet</li>';
+      } catch (err) {
+        showToast('Failed to load team members', 'error');
+        membersEl.innerHTML = '<li class="text-muted">Unable to load members</li>';
+      }
+    }
+
+    inviteBtn?.addEventListener('click', async () => {
+      const email = document.getElementById('inviteEmail').value.trim();
+      if (!email) return showToast('Enter an email to invite', 'warning');
+      try {
+        await api('/api/brands/onboard', {
+          method: 'POST',
+          body: JSON.stringify({ members: [{ email, role: 'Viewer' }] })
+        });
+        showToast('Member invited successfully', 'success');
+        loadMembers();
+      } catch (err) {
+        showToast(err.message || 'Invite failed', 'error');
+      }
+    });
+
+    setRoleBtn?.addEventListener('click', async () => {
+      const email = document.getElementById('memberEmail').value.trim();
+      const role = document.getElementById('memberRole').value;
+      if (!email) return showToast('Enter member email', 'warning');
+      try {
+        await api('/api/brands/onboard', {
+          method: 'POST',
+          body: JSON.stringify({ updateRole: { email, role } })
+        });
+        showToast(`Role updated to ${role}`, 'success');
+        loadMembers();
+      } catch (err) {
+        showToast(err.message || 'Failed to update role', 'error');
+      }
+    });
+
+    removeBtn?.addEventListener('click', async () => {
+      const email = document.getElementById('memberEmail').value.trim();
+      if (!email) return showToast('Enter member email to remove', 'warning');
+      try {
+        await api('/api/brands/onboard', {
+          method: 'POST',
+          body: JSON.stringify({ removeMember: email })
+        });
+        showToast('Member removed successfully', 'success');
+        loadMembers();
+      } catch (err) {
+        showToast(err.message || 'Failed to remove member', 'error');
+      }
+    });
+
+    // Auto-load
+    loadMembers();
+  </script>
+</body>
+</html>

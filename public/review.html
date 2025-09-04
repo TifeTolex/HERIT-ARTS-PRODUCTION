@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Review — Content Ads</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="brand-review">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header>
+    <nav class="container">
+      <div class="logo"><img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" /><span>Content Ads</span></div>
+      <div>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="projects.html">Projects</a>
+        <a href="team.html">Team</a>
+        <button class="btn ghost" id="logoutBtn">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" class="container">
+    <h1>Project</h1>
+
+    <!-- Project details -->
+    <section id="details" class="card"></section>
+
+    <!-- File delivery + feedback -->
+    <section class="card mt-2">
+      <h2>Delivered files</h2>
+      <div class="text-muted">For demo: you can upload files to simulate a delivery.</div>
+
+      <input type="file" id="uploader" multiple />
+      <button id="uploadBtn" class="btn">Upload (demo)</button>
+
+      <div id="files" class="grid mt-2"></div>
+
+      <div class="form-row mt-1">
+        <label for="reviewNotes">Notes to production</label>
+        <textarea id="reviewNotes" rows="3" placeholder="Optional feedback..."></textarea>
+      </div>
+
+      <div class="form-row inline mt-1">
+        <button id="approveBtn" class="btn secondary">Mark as approved</button>
+        <button id="requestChangesBtn" class="btn ghost">Request changes</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { requireAuthOrRedirect, logout } from '/js/utils.js';
+    requireAuthOrRedirect();
+    document.getElementById("logoutBtn")?.addEventListener("click", logout);
+  </script>
+  <script type="module" src="js/review.js"></script>
+</body>
+</html>

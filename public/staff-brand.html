@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Brands — Production</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="staff-brands">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header>
+    <nav class="container">
+      <div class="logo">
+        <img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" />
+        <span>Content Ads</span>
+      </div>
+      <div>
+        <a href="staff.html">Production</a>
+        <a href="staff-brand.html" aria-current="page">Brands</a>
+        <a href="analytics.html">Analytics</a>
+        <button class="btn ghost" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" class="container">
+    <h1>Brands</h1>
+    <section class="card">
+      <div class="form-row">
+        <input id="bsearch" placeholder="Search brands..." />
+      </div>
+      <div id="blist" class="grid cols-3 mt-2">
+        <div class="text-muted">Loading brands...</div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="js/staff.js"></script>
+</body>
+</html>

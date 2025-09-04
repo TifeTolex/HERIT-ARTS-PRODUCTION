@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Subscriptions — Content Ads</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="brand-subscriptions">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header>
+    <nav class="container">
+      <div class="logo"><img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" /><span>Content Ads</span></div>
+      <div>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="projects.html">Projects</a>
+        <a href="team.html">Team</a>
+        <a href="subscriptions.html" aria-current="page">Subscriptions</a>
+        <button class="btn ghost" id="logoutBtn">Logout</button>
+      </div>
+    </nav>
+  </header>
+  <main id="main" class="container">
+    <h1>Choose a plan</h1>
+    <section class="grid cols-3" id="plans"></section>
+    <div class="card mt-2">
+      <h2>Payment</h2>
+      <div class="form-row inline">
+        <select id="gateway">
+          <option value="paystack">Paystack</option>
+          <option value="stripe">Stripe</option>
+        </select>
+        <button class="btn" id="subscribeBtn">Subscribe</button>
+        <button class="btn ghost" id="skipBtn">Skip for now</button>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { api, requireAuthOrRedirect, logout, showToast } from '/js/utils.js';
+    requireAuthOrRedirect();
+    document.getElementById("logoutBtn")?.addEventListener("click", logout);
+
+    const cards = [
+      { id:'basic', name:'Basic', price:'$199/mo', features:['Up to 2 projects','Email support']},
+      { id:'pro', name:'Pro', price:'$499/mo', features:['Up to 6 projects','Priority support','Rush delivery']},
+      { id:'enterprise', name:'Enterprise', price:'Custom', features:['Unlimited','Dedicated manager','SLA']},
+    ];
+
+    const el = document.getElementById('plans');
+    el.innerHTML = cards.map(c => `
+      <article class="card plan" data-id="${c.id}">
+        <h3>${c.name}</h3>
+        <div class="num">${c.price}</div>
+        <ul>${c.features.map(f => '<li>'+f+'</li>').join('')}</ul>
+        <button class="btn chooseBtn" data-id="${c.id}">Choose ${c.name}</button>
+      </article>
+    `).join('');
+
+    let selected = 'basic';
+    document.querySelectorAll('.chooseBtn').forEach(b => 
+      b.addEventListener('click', () => {
+        selected = b.dataset.id;
+        document.querySelectorAll('.plan').forEach(p => p.classList.remove('selected'));
+        b.closest('.plan').classList.add('selected');
+        showToast(`${b.textContent} plan selected`, 'info');
+      })
+    );
+
+    document.getElementById('subscribeBtn').addEventListener('click', async () => {
+      const gateway = document.getElementById('gateway').value;
+      try {
+        await api('/api/brands/subscriptions', { 
+          method:'POST', 
+          body: JSON.stringify({ plan: selected, gateway }) 
+        });
+        showToast(`Subscription started on ${gateway.toUpperCase()}`, 'success');
+        location.href = 'dashboard.html';
+      } catch (err) {
+        showToast(err.message || 'Subscription failed', 'error');
+      }
+    });
+
+    document.getElementById('skipBtn').addEventListener('click', async () => {
+      try {
+        await api('/api/brands/subscriptions/skip', { method:'POST' });
+        showToast('You skipped subscription setup', 'warning');
+        location.href = 'dashboard.html';
+      } catch (err) {
+        showToast(err.message || 'Failed to skip subscription', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

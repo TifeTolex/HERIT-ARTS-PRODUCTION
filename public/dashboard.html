@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard — Content Ads</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="brand-dashboard">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header>
+    <nav class="container">
+      <div class="logo">
+        <img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" />
+        <span>Content Ads</span>
+      </div>
+      <div>
+        <a href="dashboard.html" aria-current="page">Dashboard</a>
+        <a href="projects.html">Projects</a>
+        <a href="team.html">Team</a>
+        <a href="subscriptions.html">Subscriptions</a>
+        <button class="btn ghost" id="logoutBtn">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" class="container">
+    <h1>Brand Dashboard</h1>
+
+    <!-- KPI Section -->
+    <section class="grid cols-4 mt-2" id="kpis">
+      <div class="card kpi"><div>Active projects</div><div class="num" id="kpiActive">0</div></div>
+      <div class="card kpi"><div>Queued</div><div class="num" id="kpiQueued">0</div></div>
+      <div class="card kpi"><div>Completed</div><div class="num" id="kpiCompleted">0</div></div>
+      <div class="card kpi"><div>Total</div><div class="num" id="kpiTotal">0</div></div>
+    </section>
+
+    <!-- Project List -->
+    <section class="mt-3">
+      <h2>Your projects</h2>
+      <div id="projectList" class="grid"></div>
+      <a class="btn mt-2" href="projects.html">Create new project</a>
+    </section>
+
+    <!-- Notifications -->
+    <section class="mt-3 card">
+      <h2>Notifications</h2>
+      <ul id="notifications" class="unstyled"></ul>
+    </section>
+  </main>
+
+  <script type="module">
+    import { api, requireAuthOrRedirect, logout, showToast } from '/js/utils.js';
+    requireAuthOrRedirect();
+    document.getElementById("logoutBtn").addEventListener("click", logout);
+
+    (async () => {
+      try {
+        const { projects } = await api('/api/projects');
+        const total = projects.length;
+        const active = projects.filter(p => p.status !== 'Completed').length;
+        const queued = projects.filter(p => p.status === 'Pending').length;
+        const completed = projects.filter(p => p.status === 'Completed').length;
+
+        // Update KPIs
+        document.getElementById('kpiActive').textContent = active;
+        document.getElementById('kpiQueued').textContent = queued;
+        document.getElementById('kpiCompleted').textContent = completed;
+        document.getElementById('kpiTotal').textContent = total;
+
+        // Render project list
+        const list = document.getElementById('projectList');
+        if (projects.length === 0) {
+          list.innerHTML = '<div class="text-muted">No projects yet. Create your first project.</div>';
+        } else {
+          list.classList.add('grid','cols-2');
+          list.innerHTML = projects.map(p => `
+            <article class="card fade-in">
+              <h3>${p.name || 'Untitled project'}</h3>
+              <div class="text-muted">Created: ${new Date(p.createdAt || Date.now()).toLocaleString()}</div>
+              <div>Status: <span class="status ${String(p.status||'Pending').replace(/\\s+/g,'')}">${p.status||'Pending'}</span></div>
+              <a class="btn mt-1" href="review.html?id=${encodeURIComponent(p.id)}">Open</a>
+            </article>
+          `).join('');
+        }
+
+        // Notifications
+        const notif = document.getElementById('notifications');
+        const now = new Date();
+        const statusUpdates = projects.flatMap(p => {
+          const notes = [];
+          if (['Delivered','Completed'].includes(p.status)) {
+            notes.push(`Project <strong>${p.name || 'Untitled'}</strong> is now <em>${p.status}</em>.`);
+          }
+          if (p.assignee) {
+            notes.push(`Project <strong>${p.name || 'Untitled'}</strong> has been assigned to <em>${p.assignee}</em>.`);
+          }
+          if (p.deadline) {
+            const deadline = new Date(p.deadline);
+            const diffDays = Math.ceil((deadline - now) / (1000*60*60*24));
+            if (diffDays > 0 && diffDays <= 2) {
+              notes.push(`⏰ Deadline for <strong>${p.name || 'Untitled'}</strong> is in ${diffDays} day(s).`);
+            }
+          }
+          return notes;
+        });
+
+        notif.innerHTML = statusUpdates.length
+          ? statusUpdates.map(n => `<li>${n}</li>`).join('')
+          : '<li class="text-muted">No notifications</li>';
+
+        showToast('login succesfull', 'success');
+      } catch (err) {
+        console.error('Failed to load dashboard', err);
+        showToast('Failed to load dashboard data', 'error');
+
+        ['kpiActive','kpiQueued','kpiCompleted','kpiTotal'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = '0';
+        });
+        const list = document.getElementById('projectList');
+        if (list) list.innerHTML = '<div class="text-muted">Unable to load projects at this time.</div>';
+        const notif = document.getElementById('notifications');
+        if (notif) notif.innerHTML = '<li class="text-muted">Unable to load notifications.</li>';
+      }
+    })();
+  </script>
+</body>
+</html>

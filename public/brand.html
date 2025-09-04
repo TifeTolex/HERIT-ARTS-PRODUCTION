@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Brand Profile — Production</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="staff-brand">
+
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header>
+    <nav class="container">
+      <div class="logo"><img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" /><span>Content Ads</span></div>
+      <div>
+        <a href="staff.html">Production</a>
+        <a href="staff-brands.html">Brands</a>
+        <a href="analytics.html">Analytics</a>
+        <button class="btn ghost" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+  </header>
+  <main id="main" class="container">
+    <h1 id="bname">Brand</h1>
+    <section class="grid cols-2">
+      <div class="card">
+        <h2>Profile</h2>
+        <div id="profile"></div>
+      </div>
+      <div class="card">
+        <h2>Payment status</h2>
+        <div id="payment"></div>
+      </div>
+    </section>
+    <section class="card mt-2">
+      <h2>Projects</h2>
+      <div id="projects"></div>
+    </section>
+    <section class="card mt-2">
+      <h2>Content history</h2>
+      <div id="history"></div>
+    </section>
+  </main>
+  <script type="module" src="js/staff.js"></script>
+
+</body>
+</html>

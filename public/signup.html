@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Signup — Content Ads</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header>
+    <nav class="container">
+      <div class="logo"><img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" /><span>Content Ads</span></div>
+      <div><a href="index.html">Home</a><a href="login.html">Login</a></div>
+    </nav>
+  </header>
+  <main id="main" class="container">
+    <h1>Create your brand account</h1>
+    <form id="signupForm" class="card">
+      <div class="form-row inline">
+        <div>
+          <label for="firstName">First name</label>
+          <input id="firstName" required />
+        </div>
+        <div>
+          <label for="lastName">Last name</label>
+          <input id="lastName" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="email">Email</label>
+        <input id="email" type="email" required />
+      </div>
+      <div class="form-row">
+        <label for="password">Password</label>
+        <input id="password" type="password" required />
+      </div>
+
+      <h2 class="mt-2">Business onboarding</h2>
+      <div class="form-row inline">
+        <div>
+          <label for="logo">Business logo (optional)</label>
+          <input id="logo" type="file" accept="image/*" />
+        </div>
+        <div>
+          <label for="businessName">Business name</label>
+          <input id="businessName" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="industry">Industry</label>
+        <select id="industry" required>
+          <option value="">Choose an industry</option>
+          <option>Technology</option>
+          <option>Fashion</option>
+          <option>Food & Beverage</option>
+          <option>Education</option>
+          <option>Healthcare</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-row inline">
+        <div>
+          <label for="brandColor">Brand color (hex)</label>
+          <input id="brandColor" type="text" placeholder="#0F62FE" />
+        </div>
+        <div>
+          <label for="typography">Typography guidelines (optional)</label>
+          <input id="typography" type="text" placeholder="e.g., Inter, 16/24" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="planIntent">Start with a subscription?</label>
+        <select id="planIntent">
+          <option value="later">I'll choose later</option>
+          <option value="now">Choose a plan now</option>
+        </select>
+      </div>
+      <button class="btn" type="submit">Create account</button>
+      <p class="text-muted mt-1">If no logo is uploaded, your initials will be used as a fallback.</p>
+    </form>
+  </main>
+  <script type="module" src="js/auth.js"></script>
+</body>
+</html>
