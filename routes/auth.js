@@ -1,7 +1,7 @@
 import express from 'express';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import { users, saveDb } from '../data/store.js';
+import { getUsers, addUser, saveDb } from '../data/store.js';
 
 const router = express.Router();
 
@@ -10,7 +10,7 @@ router.post('/signup', (req, res) => {
   const { firstName, lastName, email, password, businessName, industry, brandColor, typography } = req.body;
   const normalizedEmail = email.toLowerCase();
 
-  if (users.find(u => u.email.toLowerCase() === normalizedEmail)) {
+  if (getUsers().find(u => u.email.toLowerCase() === normalizedEmail)) {
     return res.status(400).json({ error: 'User already exists' });
   }
 
@@ -34,8 +34,7 @@ router.post('/signup', (req, res) => {
     }
   };
 
-  users.push(user);
-  saveDb();
+  addUser(user);
 
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
@@ -51,7 +50,7 @@ router.post('/staff-signup', (req, res) => {
   const { firstName, lastName, email, password } = req.body;
   const normalizedEmail = email.toLowerCase();
 
-  if (users.find(u => u.email.toLowerCase() === normalizedEmail)) {
+  if (getUsers().find(u => u.email.toLowerCase() === normalizedEmail)) {
     return res.status(400).json({ error: 'User already exists' });
   }
 
@@ -64,8 +63,7 @@ router.post('/staff-signup', (req, res) => {
     role: 'staff'  // ✅ always staff
   };
 
-  users.push(user);
-  saveDb();
+  addUser(user);
 
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
@@ -81,7 +79,7 @@ router.post('/login', (req, res) => {
   const { email, password, role } = req.body;
   const normalizedEmail = email.toLowerCase();
 
-  const user = users.find(
+  const user = getUsers().find(
     u => u.email.toLowerCase() === normalizedEmail && u.password === password
   );
   if (!user) return res.status(400).json({ error: 'Invalid credentials' });
