@@ -1,100 +1,81 @@
-import express from 'express';
-import crypto from 'crypto';
-import jwt from 'jsonwebtoken';
-import { getUsers, addUser, saveDb } from '../data/store.js';
+// auth.js
+import { api, saveToken, showToast } from './utils.js';
 
-const router = express.Router();
+// ================== SIGNUP ==================
+const signupForm = document.getElementById('signupForm');
+if (signupForm) {
+  signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = {
+      firstName: document.getElementById('firstName').value.trim(),
+      lastName: document.getElementById('lastName').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      password: document.getElementById('password').value,
+      businessName: document.getElementById('businessName').value.trim(),
+      industry: document.getElementById('industry').value,
+      brandColor: document.getElementById('brandColor')?.value || null,
+      typography: document.getElementById('typography')?.value || null,
+    };
+    try {
+      // ✅ Only signup call; brand is already created in backend
+      const { token } = await api('/api/auth/signup', { 
+        method: 'POST', 
+        body: JSON.stringify(data) 
+      });
+      saveToken(token);
 
-// BRAND SIGNUP
-router.post('/signup', (req, res) => {
-  const { firstName, lastName, email, password, businessName, industry, brandColor, typography } = req.body;
-  const normalizedEmail = email.toLowerCase();
-
-  if (getUsers().find(u => u.email.toLowerCase() === normalizedEmail)) {
-    return res.status(400).json({ error: 'User already exists' });
-  }
-
-  const user = {
-    id: crypto.randomUUID(),
-    firstName,
-    lastName,
-    email: normalizedEmail,
-    password,
-    role: 'brand',   // ✅ always brand
-    brand: {
-      id: crypto.randomUUID(),
-      businessName,
-      industry,
-      brandColor,
-      typography,
-      members: [{ email: normalizedEmail, role: 'Admin' }],
-      subscription: { plan: null, status: 'none', renewsAt: null, gateway: null },
-      projects: [],
-      history: []
+      const planIntent = document.getElementById('planIntent')?.value;
+      showToast("Signup successful!", "success");
+      window.location.href = planIntent === 'now' ? '/subscriptions.html' : '/dashboard.html';
+    } catch (e) {
+      showToast(e.message, "error");
     }
-  };
+  });
+}
 
-  addUser(user);
+// ================== LOGIN ==================
+const loginForm = document.getElementById('loginForm');
+if (loginForm) {
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); // ✅ stop reload
 
-  const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET || 'devsupersecret',
-    { expiresIn: '1d' }
-  );
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const role = document.getElementById('role')?.value || 'brand';
 
-  res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
-});
+    try {
+      const { token } = await api('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password, role })
+      });
+      saveToken(token);
+      localStorage.setItem('role', role);
+      showToast("Login successful!", "success");
+      window.location.href = role === 'staff' ? '/staff.html' : '/dashboard.html';
+    } catch (err) {
+      showToast(err.message || 'Login failed', "error");
+    }
+  });
+}
 
-// STAFF SIGNUP
-router.post('/staff-signup', (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
-  const normalizedEmail = email.toLowerCase();
+// ================== RESET PASSWORD ==================
+const resetForm = document.getElementById('resetForm');
+if (resetForm) {
+  resetForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-  if (getUsers().find(u => u.email.toLowerCase() === normalizedEmail)) {
-    return res.status(400).json({ error: 'User already exists' });
-  }
+    const email = document.getElementById('rpEmail').value.trim();
+    const otp = document.getElementById('rpCode').value.trim();
+    const newPassword = document.getElementById('rpNew').value;
 
-  const user = {
-    id: crypto.randomUUID(),
-    firstName,
-    lastName,
-    email: normalizedEmail,
-    password,
-    role: 'staff'  // ✅ always staff
-  };
-
-  addUser(user);
-
-  const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET || 'devsupersecret',
-    { expiresIn: '1d' }
-  );
-
-  res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
-});
-
-// LOGIN
-router.post('/login', (req, res) => {
-  const { email, password, role } = req.body;
-  const normalizedEmail = email.toLowerCase();
-
-  const user = getUsers().find(
-    u => u.email.toLowerCase() === normalizedEmail && u.password === password
-  );
-  if (!user) return res.status(400).json({ error: 'Invalid credentials' });
-
-  if (role && user.role !== role) {
-    return res.status(403).json({ error: `Role mismatch: account is '${user.role}', not '${role}'` });
-  }
-
-  const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET || 'devsupersecret',
-    { expiresIn: '1d' }
-  );
-
-  res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
-});
-
-export default router;
+    try {
+      await api('/api/auth/reset', {
+        method: 'POST',
+        body: JSON.stringify({ email, otp, newPassword })
+      });
+      showToast('Password reset successful. You can now log in.', "success");
+    } catch (err) {
+      showToast(err.message || 'Reset failed', "error");
+    }
+  });
+}
