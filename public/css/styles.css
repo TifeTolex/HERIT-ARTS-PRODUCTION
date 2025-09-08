@@ -244,3 +244,4 @@ html[data-theme="dark"] .table th { background: #334155; }
 @keyframes toast-out {
   to { opacity:0; transform:translateY(-10px); }
 }
+

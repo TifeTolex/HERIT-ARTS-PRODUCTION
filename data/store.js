@@ -13,7 +13,12 @@ function load() {
     return { users: [], brands: [], projects: [], otps: [] };
   }
   const raw = fs.readFileSync(dbPath, 'utf-8');
-  return JSON.parse(raw);
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    console.error('Failed to parse db.json, starting fresh', err);
+    return { users: [], brands: [], projects: [], otps: [] };
+  }
 }
 
 // Save JSON file
@@ -28,13 +33,38 @@ let db = load();
 export function getDb() {
   return db;
 }
-
 export function saveDb() {
   save(db);
 }
 
-// Shortcuts (used in routes)
-export const users = db.users || [];
-export const brands = db.brands || [];
-export const projects = db.projects || [];
-export const otps = db.otps || [];
+// Getters to always return live arrays
+export function getUsers() {
+  return db.users;
+}
+export function getBrands() {
+  return db.brands;
+}
+export function getProjects() {
+  return db.projects;
+}
+export function getOtps() {
+  return db.otps;
+}
+
+// Allow adding new entities easily
+export function addUser(user) {
+  db.users.push(user);
+  saveDb();
+}
+export function addBrand(brand) {
+  db.brands.push(brand);
+  saveDb();
+}
+export function addProject(project) {
+  db.projects.push(project);
+  saveDb();
+}
+export function addOtp(otp) {
+  db.otps.push(otp);
+  saveDb();
+}

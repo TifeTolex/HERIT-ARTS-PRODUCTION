@@ -5,6 +5,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard — Content Ads</title>
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* --- Responsive nav upgrade with animation --- */
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        right: 1rem;
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        z-index: 1000;
+
+        /* animation states */
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+      }
+
+      .nav-links.active {
+        display: flex;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+    }
+  </style>
 </head>
 <body data-page="brand-dashboard">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -14,7 +59,12 @@
         <img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" />
         <span>Content Ads</span>
       </div>
-      <div>
+
+      <!-- Mobile menu toggle -->
+      <button class="menu-toggle" aria-label="Toggle menu">☰</button>
+
+      <!-- Navigation links -->
+      <div class="nav-links">
         <a href="dashboard.html" aria-current="page">Dashboard</a>
         <a href="projects.html">Projects</a>
         <a href="team.html">Team</a>
@@ -78,7 +128,7 @@
             <article class="card fade-in">
               <h3>${p.name || 'Untitled project'}</h3>
               <div class="text-muted">Created: ${new Date(p.createdAt || Date.now()).toLocaleString()}</div>
-              <div>Status: <span class="status ${String(p.status||'Pending').replace(/\\s+/g,'')}">${p.status||'Pending'}</span></div>
+              <div>Status: <span class="status ${String(p.status||'Pending').replace(/\s+/g,'')}">${p.status||'Pending'}</span></div>
               <a class="btn mt-1" href="review.html?id=${encodeURIComponent(p.id)}">Open</a>
             </article>
           `).join('');
@@ -124,6 +174,16 @@
         if (notif) notif.innerHTML = '<li class="text-muted">Unable to load notifications.</li>';
       }
     })();
+  </script>
+
+  <script>
+    // Toggle mobile menu with smooth animation
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+
+    menuToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
   </script>
 </body>
 </html>

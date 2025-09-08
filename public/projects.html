@@ -5,13 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Projects — Content Ads</title>
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* --- Responsive nav upgrade with animation --- */
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        right: 1rem;
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        z-index: 1000;
+
+        /* animation states */
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+      }
+
+      .nav-links.active {
+        display: flex;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+    }
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <header>
     <nav class="container">
-      <div class="logo"><img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" /><span>Content Ads</span></div>
-      <div>
+      <div class="logo">
+        <img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" />
+        <span>Content Ads</span>
+      </div>
+
+      <!-- Mobile menu toggle -->
+      <button class="menu-toggle" aria-label="Toggle menu">☰</button>
+
+      <!-- Navigation links -->
+      <div class="nav-links">
         <a href="dashboard.html">Dashboard</a>
         <a href="projects.html" aria-current="page">Projects</a>
         <a href="team.html">Team</a>
@@ -130,28 +183,35 @@
     </form>
   </main>
   <script type="module" src="js/projects.js"></script>
-  ,
-<script type="module">
-  import { requireAuthOrRedirect, logout } from '/js/utils.js';
-  requireAuthOrRedirect();
+  <script type="module">
+    import { requireAuthOrRedirect, logout } from '/js/utils.js';
+    requireAuthOrRedirect();
 
-  // Make logout available for inline onclick="logout()"
-  window.logout = logout;
+    // Make logout available for inline onclick="logout()"
+    window.logout = logout;
 
-  // Also bind a click handler for pages that use an ID or data-attr
-  const btn =
-    document.getElementById('logoutBtn') ||
-    document.querySelector('[data-action="logout"]') ||
-    document.querySelector('button[onclick*="logout"]');
+    // Also bind a click handler for pages that use an ID or data-attr
+    const btn =
+      document.getElementById('logoutBtn') ||
+      document.querySelector('[data-action="logout"]') ||
+      document.querySelector('button[onclick*="logout"]');
 
-  if (btn) {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      logout();
+    if (btn) {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        logout();
+      });
+    }
+  </script>
+
+  <script>
+    // Toggle mobile menu with smooth animation
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+
+    menuToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
     });
-  }
-</script>
-
-
+  </script>
 </body>
 </html>

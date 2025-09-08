@@ -1,15 +1,15 @@
 import express from 'express';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import { users, saveDb } from '../data/store.js';
 
 const router = express.Router();
 
-// SIGNUP
+// BRAND SIGNUP
 router.post('/signup', (req, res) => {
-  const { firstName, lastName, email, password, businessName, industry, brandColor, typography, role } = req.body;
+  const { firstName, lastName, email, password, businessName, industry, brandColor, typography } = req.body;
   const normalizedEmail = email.toLowerCase();
 
-  // Prevent duplicate users (case-insensitive)
   if (users.find(u => u.email.toLowerCase() === normalizedEmail)) {
     return res.status(400).json({ error: 'User already exists' });
   }
@@ -20,7 +20,7 @@ router.post('/signup', (req, res) => {
     lastName,
     email: normalizedEmail,
     password,
-    role: role || 'brand',
+    role: 'brand',   // ✅ always brand
     brand: {
       id: crypto.randomUUID(),
       businessName,
@@ -36,7 +36,44 @@ router.post('/signup', (req, res) => {
 
   users.push(user);
   saveDb();
-  res.json({ token: user.id });
+
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET || 'devsupersecret',
+    { expiresIn: '1d' }
+  );
+
+  res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
+});
+
+// STAFF SIGNUP
+router.post('/staff-signup', (req, res) => {
+  const { firstName, lastName, email, password } = req.body;
+  const normalizedEmail = email.toLowerCase();
+
+  if (users.find(u => u.email.toLowerCase() === normalizedEmail)) {
+    return res.status(400).json({ error: 'User already exists' });
+  }
+
+  const user = {
+    id: crypto.randomUUID(),
+    firstName,
+    lastName,
+    email: normalizedEmail,
+    password,
+    role: 'staff'  // ✅ always staff
+  };
+
+  users.push(user);
+  saveDb();
+
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET || 'devsupersecret',
+    { expiresIn: '1d' }
+  );
+
+  res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
 });
 
 // LOGIN
@@ -44,24 +81,22 @@ router.post('/login', (req, res) => {
   const { email, password, role } = req.body;
   const normalizedEmail = email.toLowerCase();
 
-  const user = users.find(u => u.email.toLowerCase() === normalizedEmail && u.password === password);
+  const user = users.find(
+    u => u.email.toLowerCase() === normalizedEmail && u.password === password
+  );
   if (!user) return res.status(400).json({ error: 'Invalid credentials' });
-  if (role && user.role !== role) return res.status(403).json({ error: 'Role mismatch' });
 
-  res.json({ token: user.id });
-});
+  if (role && user.role !== role) {
+    return res.status(403).json({ error: `Role mismatch: account is '${user.role}', not '${role}'` });
+  }
 
-// RESET PASSWORD
-router.post('/reset', (req, res) => {
-  const { email, newPassword } = req.body;
-  const normalizedEmail = email.toLowerCase();
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET || 'devsupersecret',
+    { expiresIn: '1d' }
+  );
 
-  const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
-  if (!user) return res.status(400).json({ error: 'No user' });
-
-  user.password = newPassword;
-  saveDb();
-  res.json({ ok: true });
+  res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
 });
 
 export default router;
