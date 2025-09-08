@@ -3,10 +3,16 @@ import crypto from 'crypto';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { users, saveDb } from '../data/store.js';
+import { getUsers, saveDb } from '../data/store.js';
 
 const router = express.Router();
-function findMe(req){ return users.find(u => u.id === req.headers.authorization?.replace('Bearer ', '')); }
+
+// Helper to find current user
+function findMe(req) {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return null;
+  return getUsers().find(u => u.id === token);
+}
 
 // ================== Multer setup ==================
 const uploadDir = path.join(process.cwd(), 'uploads');
@@ -15,7 +21,7 @@ if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + Math.round(Math.random()*1e9);
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
     cb(null, unique + path.extname(file.originalname));
   }
 });
@@ -81,6 +87,7 @@ router.post('/:id/approve', (req, res) => {
   saveDb();
   res.json({ project: proj });
 });
+
 router.post('/:id/changes', (req, res) => {
   const me = findMe(req);
   const proj = me?.brand?.projects.find(p => p.id === req.params.id);
@@ -94,13 +101,13 @@ router.post('/:id/changes', (req, res) => {
 
 // All projects
 router.get('/admin/all', (req, res) => {
-  const projects = users.flatMap(u => u.brand?.projects || []);
+  const projects = getUsers().flatMap(u => u.brand?.projects || []);
   res.json({ projects });
 });
 
 // Single project
 router.get('/admin/:id', (req, res) => {
-  const projects = users.flatMap(u => u.brand?.projects || []);
+  const projects = getUsers().flatMap(u => u.brand?.projects || []);
   const proj = projects.find(p => p.id === req.params.id);
   if (!proj) return res.status(404).json({ error: 'Not found' });
   res.json(proj);
@@ -108,7 +115,7 @@ router.get('/admin/:id', (req, res) => {
 
 // Assign
 router.post('/admin/:id/assign', (req, res) => {
-  const projects = users.flatMap(u => u.brand?.projects || []);
+  const projects = getUsers().flatMap(u => u.brand?.projects || []);
   const proj = projects.find(p => p.id === req.params.id);
   if (!proj) return res.status(404).json({ error: 'Not found' });
   proj.assignee = req.body.email;
@@ -119,7 +126,7 @@ router.post('/admin/:id/assign', (req, res) => {
 
 // Deliver with optional file upload
 router.post('/admin/:id/deliver', upload.array('files'), (req, res) => {
-  const projects = users.flatMap(u => u.brand?.projects || []);
+  const projects = getUsers().flatMap(u => u.brand?.projects || []);
   const proj = projects.find(p => p.id === req.params.id);
   if (!proj) return res.status(404).json({ error: 'Not found' });
 
@@ -140,17 +147,17 @@ router.post('/admin/:id/deliver', upload.array('files'), (req, res) => {
 
 // Analytics
 router.get('/admin-analytics/summary', (req, res) => {
-  const projects = users.flatMap(u => u.brand?.projects || []);
-  const brands = users.filter(u=>u.brand).map(u=>u.brand);
-  const completed = projects.filter(p=>p.status==='Completed').length;
-  const revenue = brands.reduce((sum,b)=> b.subscription?.plan ? sum+200 : sum, 0); // dummy
+  const projects = getUsers().flatMap(u => u.brand?.projects || []);
+  const brands = getUsers().filter(u => u.brand).map(u => u.brand);
+  const completed = projects.filter(p => p.status === 'Completed').length;
+  const revenue = brands.reduce((sum, b) => b.subscription?.plan ? sum + 200 : sum, 0); // dummy
   res.json({
     revenueFormatted: `$${revenue}`,
     projectsCompleted: completed,
-    activeBrands: brands.filter(b=>b.projects?.length).length,
-    inactiveBrands: brands.filter(b=>!(b.projects?.length)).length,
-    topBrands: brands.slice(0,5).map(b=>({ name:b.businessName, count:b.projects?.length||0 })),
-    perMonth: [{ month:'Aug', count: projects.length }]
+    activeBrands: brands.filter(b => b.projects?.length).length,
+    inactiveBrands: brands.filter(b => !(b.projects?.length)).length,
+    topBrands: brands.slice(0, 5).map(b => ({ name: b.businessName, count: b.projects?.length || 0 })),
+    perMonth: [{ month: 'Aug', count: projects.length }]
   });
 });
 
