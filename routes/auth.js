@@ -17,10 +17,7 @@ function generateToken(user) {
 
 // ================== BRAND SIGNUP ==================
 router.post('/signup', (req, res) => {
-  const {
-    firstName, lastName, email, password,
-    businessName, industry, brandColor, typography
-  } = req.body;
+  const { firstName, lastName, email, password, businessName, industry, brandColor, typography } = req.body;
 
   if (!email || !password || !firstName || !lastName) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -51,7 +48,7 @@ router.post('/signup', (req, res) => {
     }
   };
 
-  addUser(user); // will automatically save
+  addUser(user);
 
   const token = generateToken(user);
   res.json({ success: true, token, user: { id: user.id, email: user.email, role: user.role } });
@@ -79,7 +76,7 @@ router.post('/staff-signup', (req, res) => {
     role: 'staff'
   };
 
-  addUser(user); // will automatically save
+  addUser(user);
 
   const token = generateToken(user);
   res.json({ success: true, token, user: { id: user.id, email: user.email, role: user.role } });
@@ -95,21 +92,19 @@ router.post('/login', (req, res) => {
 
   const normalizedEmail = email.trim().toLowerCase();
   const users = getUsers();
-  const user = users.find(
-    u => u.email.toLowerCase() === normalizedEmail && u.password === password
-  );
+  const user = users.find(u => u.email.toLowerCase() === normalizedEmail && u.password === password);
 
   if (!user) {
     return res.status(400).json({ error: 'Invalid credentials' });
   }
 
-  // ✅ If user has no role, assign 'brand' and persist it
+  // ✅ Assign 'brand' role to old users without role
   if (!user.role) {
     user.role = 'brand';
-    saveDb();
+    saveDb(); // persist role
   }
 
-  // ✅ Block login if chosen role doesn’t match actual role
+  // ✅ Role mismatch check
   if (role && user.role !== role) {
     return res.status(403).json({ error: `Role mismatch: account is '${user.role}', not '${role}'` });
   }

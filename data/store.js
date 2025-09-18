@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 
 const dbPath = path.join(__dirname, 'db.json');
 
-// Load JSON file
+// Load JSON file or initialize if missing
 function load() {
   if (!fs.existsSync(dbPath)) {
     return { users: [], brands: [], projects: [], otps: [] };
@@ -29,15 +29,16 @@ function save(data) {
 // Load database into memory
 let db = load();
 
-// Helpers
+// ------------------ Helpers ------------------
 export function getDb() {
   return db;
 }
+
 export function saveDb() {
   save(db);
 }
 
-// Getters to always return live arrays
+// ------------------ Getters ------------------
 export function getUsers() {
   return db.users;
 }
@@ -51,7 +52,7 @@ export function getOtps() {
   return db.otps;
 }
 
-// Allow adding new entities easily
+// ------------------ Adders ------------------
 export function addUser(user) {
   db.users.push(user);
   saveDb();
