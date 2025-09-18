@@ -4,15 +4,9 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { getUsers, saveDb } from '../data/store.js';
+import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
-
-// Helper to find current user
-function findMe(req) {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) return null;
-  return getUsers().find(u => u.id === token);
-}
 
 // ================== Multer setup ==================
 const uploadDir = path.join(process.cwd(), 'uploads');
@@ -30,8 +24,8 @@ const upload = multer({ storage });
 // ================== Brand Routes ==================
 
 // Create project
-router.post('/', (req, res) => {
-  const me = findMe(req);
+router.post('/', requireAuth, (req, res) => {
+  const me = getUsers().find(u => u.id === req.user.id);
   if (!me?.brand) return res.status(401).json({ error: 'Unauthorized' });
 
   const proj = {
@@ -47,22 +41,22 @@ router.post('/', (req, res) => {
 });
 
 // List my projects
-router.get('/', (req, res) => {
-  const me = findMe(req);
+router.get('/', requireAuth, (req, res) => {
+  const me = getUsers().find(u => u.id === req.user.id);
   res.json({ projects: me?.brand?.projects || [] });
 });
 
-// Get single project (always include files)
-router.get('/:id', (req, res) => {
-  const me = findMe(req);
+// Get single project
+router.get('/:id', requireAuth, (req, res) => {
+  const me = getUsers().find(u => u.id === req.user.id);
   const proj = me?.brand?.projects.find(p => p.id === req.params.id);
   if (!proj) return res.status(404).json({ error: 'Not found' });
   res.json({ project: proj });
 });
 
 // Upload files (brand)
-router.post('/:id/upload', upload.array('files'), (req, res) => {
-  const me = findMe(req);
+router.post('/:id/upload', requireAuth, upload.array('files'), (req, res) => {
+  const me = getUsers().find(u => u.id === req.user.id);
   const proj = me?.brand?.projects.find(p => p.id === req.params.id);
   if (!proj) return res.status(404).json({ error: 'Not found' });
 
@@ -79,8 +73,8 @@ router.post('/:id/upload', upload.array('files'), (req, res) => {
 });
 
 // Approve / Changes
-router.post('/:id/approve', (req, res) => {
-  const me = findMe(req);
+router.post('/:id/approve', requireAuth, (req, res) => {
+  const me = getUsers().find(u => u.id === req.user.id);
   const proj = me?.brand?.projects.find(p => p.id === req.params.id);
   if (!proj) return res.status(404).json({ error: 'Not found' });
   proj.status = 'Completed';
@@ -88,8 +82,8 @@ router.post('/:id/approve', (req, res) => {
   res.json({ project: proj });
 });
 
-router.post('/:id/changes', (req, res) => {
-  const me = findMe(req);
+router.post('/:id/changes', requireAuth, (req, res) => {
+  const me = getUsers().find(u => u.id === req.user.id);
   const proj = me?.brand?.projects.find(p => p.id === req.params.id);
   if (!proj) return res.status(404).json({ error: 'Not found' });
   proj.status = 'In Progress';
@@ -97,35 +91,36 @@ router.post('/:id/changes', (req, res) => {
   res.json({ project: proj });
 });
 
-// ================= Staff Routes =================
+// ================== Staff/Admin Routes ==================
 
-// All projects
-router.get('/admin/all', (req, res) => {
+// List all projects
+router.get('/admin/all', requireAuth, (req, res) => {
   const projects = getUsers().flatMap(u => u.brand?.projects || []);
   res.json({ projects });
 });
 
-// Single project
-router.get('/admin/:id', (req, res) => {
+// Get single project by ID
+router.get('/admin/:id', requireAuth, (req, res) => {
   const projects = getUsers().flatMap(u => u.brand?.projects || []);
   const proj = projects.find(p => p.id === req.params.id);
   if (!proj) return res.status(404).json({ error: 'Not found' });
-  res.json(proj);
+  res.json({ project: proj });
 });
 
-// Assign
-router.post('/admin/:id/assign', (req, res) => {
+// Assign project to staff
+router.post('/admin/:id/assign', requireAuth, (req, res) => {
   const projects = getUsers().flatMap(u => u.brand?.projects || []);
   const proj = projects.find(p => p.id === req.params.id);
   if (!proj) return res.status(404).json({ error: 'Not found' });
+
   proj.assignee = req.body.email;
   proj.status = 'In Progress';
   saveDb();
   res.json({ project: proj });
 });
 
-// Deliver with optional file upload
-router.post('/admin/:id/deliver', upload.array('files'), (req, res) => {
+// Deliver project with optional file upload
+router.post('/admin/:id/deliver', requireAuth, upload.array('files'), (req, res) => {
   const projects = getUsers().flatMap(u => u.brand?.projects || []);
   const proj = projects.find(p => p.id === req.params.id);
   if (!proj) return res.status(404).json({ error: 'Not found' });
@@ -145,12 +140,13 @@ router.post('/admin/:id/deliver', upload.array('files'), (req, res) => {
   res.json({ project: proj });
 });
 
-// Analytics
-router.get('/admin-analytics/summary', (req, res) => {
+// Analytics summary
+router.get('/admin-analytics/summary', requireAuth, (req, res) => {
   const projects = getUsers().flatMap(u => u.brand?.projects || []);
   const brands = getUsers().filter(u => u.brand).map(u => u.brand);
   const completed = projects.filter(p => p.status === 'Completed').length;
   const revenue = brands.reduce((sum, b) => b.subscription?.plan ? sum + 200 : sum, 0); // dummy
+
   res.json({
     revenueFormatted: `$${revenue}`,
     projectsCompleted: completed,
