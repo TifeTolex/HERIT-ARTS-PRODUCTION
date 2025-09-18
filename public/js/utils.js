@@ -3,10 +3,6 @@ const API_BASE = window.location.hostname.includes('localhost')
   ? '' // Local dev: use relative paths
   : ''; // Render deployment (same server serves API + frontend)
 
-// If later you host frontend separately (like Vercel) and backend on Render,
-// change the second '' to your backend URL, e.g.:
-// : 'https://your-backend.onrender.com'
-
 export function $(selector, ctx = document){ return ctx.querySelector(selector); }
 export function $all(selector, ctx = document){ return Array.from(ctx.querySelectorAll(selector)); }
 
@@ -73,7 +69,7 @@ export function showToast(message, type = 'info', timeout = 3000) {
   }, timeout);
 }
 
-// backward compatibility for existing calls
+// backward compatibility
 export function toast(msg, type='info'){ showToast(msg, type); }
 
 // =====================
@@ -86,16 +82,30 @@ export function clearToken(){ localStorage.removeItem('token'); }
 export async function api(path, options = {}){
   const headers = options.headers || {};
   const token = getToken();
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+    console.log('[api] Using token:', token.slice(0, 10) + '...'); // ✅ debug
+  } else {
+    console.warn('[api] No token found for request to', path); // ✅ debug
+  }
+
   if (!(options.body instanceof FormData)) {
     headers['Content-Type'] = 'application/json';
   }
-  const res = await fetch(API_BASE + path, { ...options, headers });
-  if (!res.ok){
-    const err = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(err.error || 'Request failed');
+
+  try {
+    const res = await fetch(API_BASE + path, { ...options, headers });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      console.error('[api] Request failed', res.status, err); // ✅ debug
+      throw new Error(err.error || 'Request failed');
+    }
+    return res.json();
+  } catch (e) {
+    console.error('[api] Network or server error:', e); // ✅ debug
+    throw e;
   }
-  return res.json();
 }
 
 export function requireAuthOrRedirect(){
