@@ -16,18 +16,26 @@ if (signupForm) {
       brandColor: document.getElementById('brandColor')?.value || null,
       typography: document.getElementById('typography')?.value || null,
     };
+
     try {
-      const { token } = await api('/api/auth/signup', { method:'POST', body: JSON.stringify(data) });
+      const { token } = await api('/api/auth/signup', { 
+        method: 'POST', 
+        body: JSON.stringify(data) 
+      });
+
       saveToken(token);
-      await api('/api/brands/onboard', { method:'POST', body: JSON.stringify(data) });
       const planIntent = document.getElementById('planIntent')?.value;
+
       showToast("Signup successful!", "success");
-      window.location.href = planIntent === 'now' ? '/subscriptions.html' : '/dashboard.html';
+      window.location.href = planIntent === 'now' 
+        ? '/subscriptions.html' 
+        : '/dashboard.html';
     } catch (e) {
-      showToast(e.message, "error");
+      showToast(e.message || "Signup failed", "error");
     }
   });
 }
+
 
 // ================== LOGIN ==================
 const loginForm = document.getElementById('loginForm');
