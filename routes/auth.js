@@ -1,10 +1,9 @@
 import express from 'express';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import { getUsers, addUser } from '../data/store.js';
+import { getUsers, addUser, saveDB } from '../data/store.js';
 
 const router = express.Router();
-
 const JWT_SECRET = process.env.JWT_SECRET || 'devsupersecret';
 
 // Helper to generate JWT
@@ -95,7 +94,8 @@ router.post('/login', (req, res) => {
   }
 
   const normalizedEmail = email.trim().toLowerCase();
-  const user = getUsers().find(
+  const users = getUsers();
+  const user = users.find(
     u => u.email.toLowerCase() === normalizedEmail && u.password === password
   );
 
@@ -103,6 +103,13 @@ router.post('/login', (req, res) => {
     return res.status(400).json({ error: 'Invalid credentials' });
   }
 
+  // ✅ If user has no role, assign 'brand' and persist
+  if (!user.role) {
+    user.role = 'brand';
+    saveDB(); // persist the updated role
+  }
+
+  // ✅ Block login if chosen role doesn’t match actual role
   if (role && user.role !== role) {
     return res.status(403).json({ error: `Role mismatch: account is '${user.role}', not '${role}'` });
   }
