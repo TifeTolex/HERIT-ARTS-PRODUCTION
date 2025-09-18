@@ -1,7 +1,7 @@
 import express from 'express';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import { getUsers, addUser, saveDB } from '../data/store.js';
+import { getUsers, addUser, saveDb } from '../data/store.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'devsupersecret';
@@ -51,7 +51,7 @@ router.post('/signup', (req, res) => {
     }
   };
 
-  addUser(user);
+  addUser(user); // will automatically save
 
   const token = generateToken(user);
   res.json({ success: true, token, user: { id: user.id, email: user.email, role: user.role } });
@@ -79,7 +79,7 @@ router.post('/staff-signup', (req, res) => {
     role: 'staff'
   };
 
-  addUser(user);
+  addUser(user); // will automatically save
 
   const token = generateToken(user);
   res.json({ success: true, token, user: { id: user.id, email: user.email, role: user.role } });
@@ -103,10 +103,10 @@ router.post('/login', (req, res) => {
     return res.status(400).json({ error: 'Invalid credentials' });
   }
 
-  // ✅ If user has no role, assign 'brand' and persist
+  // ✅ If user has no role, assign 'brand' and persist it
   if (!user.role) {
     user.role = 'brand';
-    saveDB(); // persist the updated role
+    saveDb();
   }
 
   // ✅ Block login if chosen role doesn’t match actual role
