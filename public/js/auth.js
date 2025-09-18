@@ -11,53 +11,57 @@ if (signupForm) {
       lastName: document.getElementById('lastName').value.trim(),
       email: document.getElementById('email').value.trim(),
       password: document.getElementById('password').value,
-      businessName: document.getElementById('businessName').value.trim(),
-      industry: document.getElementById('industry').value,
+      businessName: document.getElementById('businessName')?.value.trim() || null,
+      industry: document.getElementById('industry')?.value || null,
       brandColor: document.getElementById('brandColor')?.value || null,
       typography: document.getElementById('typography')?.value || null,
+      role: document.getElementById('role')?.value || 'brand' // 👈 allow brand/staff
     };
 
     try {
-      const { token } = await api('/api/auth/signup', { 
+      const { token, role } = await api('/api/auth/signup', { 
         method: 'POST', 
         body: JSON.stringify(data) 
       });
 
       saveToken(token);
-      const planIntent = document.getElementById('planIntent')?.value;
-
+      localStorage.setItem('role', role || data.role);
       showToast("Signup successful!", "success");
-      window.location.href = planIntent === 'now' 
-        ? '/subscriptions.html' 
-        : '/dashboard.html';
+
+      const planIntent = document.getElementById('planIntent')?.value;
+      window.location.href = (role || data.role) === 'staff'
+        ? '/staff.html'
+        : (planIntent === 'now' ? '/subscriptions.html' : '/dashboard.html');
     } catch (e) {
       showToast(e.message || "Signup failed", "error");
     }
   });
 }
 
-
 // ================== LOGIN ==================
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
   loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault(); // ✅ stop reload
+    e.preventDefault();
 
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    const role = document.getElementById('role')?.value || 'brand';
+    const chosenRole = document.getElementById('role')?.value;
 
     try {
-      const { token } = await api('/api/auth/login', {
+      const { token, role } = await api('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password, role })
+        body: JSON.stringify({ email, password, role: chosenRole })
       });
+
+      const finalRole = role || chosenRole || 'brand';
       saveToken(token);
-      localStorage.setItem('role', role);
+      localStorage.setItem('role', finalRole);
+
       showToast("Login successful!", "success");
-      window.location.href = role === 'staff' ? '/staff.html' : '/dashboard.html';
+      window.location.href = finalRole === 'staff' ? '/staff.html' : '/dashboard.html';
     } catch (err) {
-      showToast(err.message || 'Login failed', "error");
+      showToast(err.message || 'Invalid credentials', "error");
     }
   });
 }
