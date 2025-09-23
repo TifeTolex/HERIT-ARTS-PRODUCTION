@@ -66,24 +66,25 @@ if (loginForm) {
   });
 }
 
-// ================== RESET PASSWORD ==================
+// ================== REQUEST PASSWORD RESET ==================
 const resetForm = document.getElementById('resetForm');
 if (resetForm) {
   resetForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const email = document.getElementById('rpEmail').value.trim();
-    const otp = document.getElementById('rpCode').value.trim();
-    const newPassword = document.getElementById('rpNew').value;
 
     try {
-      await api('/api/auth/reset', {
+      await api('/api/auth/request-password-reset', {
         method: 'POST',
-        body: JSON.stringify({ email, otp, newPassword })
+        body: JSON.stringify({ email })
       });
-      showToast('Password reset successful. You can now log in.', "success");
+
+      showToast('If the email exists, a reset link has been sent.', "success");
+      resetForm.reset();
     } catch (err) {
-      showToast(err.message || 'Reset failed', "error");
+      showToast(err.message || 'Request failed', "error");
     }
   });
 }
+

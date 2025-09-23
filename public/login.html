@@ -50,26 +50,19 @@
         <button class="btn ghost" type="button" id="forgotBtn">Forgot password</button>
       </form>
 
-      <!-- RESET FORM (hidden until triggered) -->
-      <div id="resetCard" class="card fade-in">
-        <h3>Reset password</h3>
-        <form id="resetForm">
-          <div class="form-row">
-            <label for="rpEmail">Email</label>
-            <input id="rpEmail" name="rpEmail" type="email" required />
-          </div>
-          <div class="form-row">
-            <label for="rpCode">OTP Code</label>
-            <input id="rpCode" name="rpCode" type="text" placeholder="e.g. 123456" />
-          </div>
-          <div class="form-row">
-            <label for="rpNew">New password</label>
-            <input id="rpNew" name="rpNew" type="password" />
-          </div>
-          <button class="btn" type="submit">Reset</button>
-          <button class="btn ghost mt-1" type="button" id="backBtn">Back to login</button>
-        </form>
-      </div>
+  <!-- RESET FORM (hidden until triggered) -->
+<div id="resetCard" class="card fade-in">
+  <h3>Reset password</h3>
+  <form id="resetForm">
+    <div class="form-row">
+      <label for="rpEmail">Email</label>
+      <input id="rpEmail" name="rpEmail" type="email" required placeholder="Enter your email" />
+    </div>
+    <button class="btn" type="submit">Send Reset Link</button>
+    <button class="btn ghost mt-1" type="button" id="backBtn">Back to login</button>
+  </form>
+</div>
+
     </div>
   </main>
 

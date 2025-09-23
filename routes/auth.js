@@ -3,7 +3,6 @@ import express from 'express';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import zxcvbn from 'zxcvbn';
 import { getUsers, addUser, saveDb } from '../data/store.js';
 import { sendWelcomeEmail, sendPasswordResetEmail } from '../utils/email.js';
 
@@ -25,14 +24,6 @@ router.post('/signup', async (req, res) => {
 
   if (!email || !password || !firstName || !lastName) {
     return res.status(400).json({ error: 'Missing required fields' });
-  }
-
-  // ✅ Password strength check
-  const strength = zxcvbn(password);
-  if (strength.score < 2) {
-    return res.status(400).json({
-      error: 'Password too weak. Use at least 8 characters, with numbers & symbols.'
-    });
   }
 
   const normalizedEmail = email.trim().toLowerCase();
@@ -64,6 +55,7 @@ router.post('/signup', async (req, res) => {
 
   addUser(user);
 
+  // Send welcome email (non-blocking)
   sendWelcomeEmail(user.email, user.firstName).catch(err => console.error('Email error:', err));
 
   const token = generateToken(user);
@@ -76,14 +68,6 @@ router.post('/staff-signup', async (req, res) => {
 
   if (!email || !password || !firstName || !lastName) {
     return res.status(400).json({ error: 'Missing required fields' });
-  }
-
-  // ✅ Password strength check
-  const strength = zxcvbn(password);
-  if (strength.score < 2) {
-    return res.status(400).json({
-      error: 'Password too weak. Use at least 8 characters, with numbers & symbols.'
-    });
   }
 
   const normalizedEmail = email.trim().toLowerCase();
@@ -114,23 +98,16 @@ router.post('/staff-signup', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { email, password, role } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Missing email or password' });
-  }
+  if (!email || !password) return res.status(400).json({ error: 'Missing email or password' });
 
   const normalizedEmail = email.trim().toLowerCase();
   const users = getUsers();
   const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
 
-  if (!user) {
-    return res.status(400).json({ error: 'Invalid credentials' });
-  }
+  if (!user) return res.status(400).json({ error: 'Invalid credentials' });
 
-  // ✅ Compare hashed password
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) {
-    return res.status(400).json({ error: 'Invalid credentials' });
-  }
+  const valid = await bcrypt.compare(password, user.password);
+  if (!valid) return res.status(400).json({ error: 'Invalid credentials' });
 
   if (!user.role) {
     user.role = 'brand';
@@ -146,7 +123,7 @@ router.post('/login', async (req, res) => {
 });
 
 // ================== REQUEST PASSWORD RESET ==================
-router.post('/request-password-reset', (req, res) => {
+router.post('/request-password-reset', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email is required' });
 
@@ -155,20 +132,13 @@ router.post('/request-password-reset', (req, res) => {
   const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
 
   if (!user) {
+    // Don't reveal if user exists
     return res.json({ success: true, message: 'If the email exists, a reset link has been sent.' });
   }
 
-  const resetToken = jwt.sign(
-    { id: user.id, email: user.email },
-    JWT_SECRET,
-    { expiresIn: '15m' }
-  );
+  const resetToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '15m' });
 
-  import('../utils/email.js').then(({ sendPasswordResetEmail }) => {
-    sendPasswordResetEmail(user.email, resetToken).catch(err => {
-      console.error('Failed to send reset email:', err);
-    });
-  });
+  sendPasswordResetEmail(user.email, resetToken).catch(err => console.error('Failed to send reset email:', err));
 
   res.json({ success: true, message: 'If the email exists, a reset link has been sent.' });
 });
@@ -177,26 +147,13 @@ router.post('/request-password-reset', (req, res) => {
 router.post('/reset-password', async (req, res) => {
   const { token, newPassword } = req.body;
 
-  if (!token || !newPassword) {
-    return res.status(400).json({ error: 'Missing token or new password' });
-  }
-
-  // ✅ Password strength check
-  const strength = zxcvbn(newPassword);
-  if (strength.score < 2) {
-    return res.status(400).json({
-      error: 'Password too weak. Use at least 8 characters, with numbers & symbols.'
-    });
-  }
+  if (!token || !newPassword) return res.status(400).json({ error: 'Missing token or new password' });
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-
     const users = getUsers();
     const user = users.find(u => u.id === decoded.id && u.email === decoded.email);
-    if (!user) {
-      return res.status(400).json({ error: 'Invalid token or user not found' });
-    }
+    if (!user) return res.status(400).json({ error: 'Invalid token or user not found' });
 
     user.password = await bcrypt.hash(newPassword, 10);
     saveDb();
