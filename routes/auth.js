@@ -11,7 +11,7 @@ function generateToken(user) {
   return jwt.sign(
     { id: user.id, email: user.email, role: user.role },
     JWT_SECRET,
-    { expiresIn: '1d' }
+    { expiresIn: '7d' }
   );
 }
 
@@ -48,7 +48,7 @@ router.post('/signup', (req, res) => {
     }
   };
 
-  addUser(user);
+  addUser(user); // ✅ auto-saves
 
   const token = generateToken(user);
   res.json({ success: true, token, user: { id: user.id, email: user.email, role: user.role } });
@@ -76,7 +76,7 @@ router.post('/staff-signup', (req, res) => {
     role: 'staff'
   };
 
-  addUser(user);
+  addUser(user); // ✅ auto-saves
 
   const token = generateToken(user);
   res.json({ success: true, token, user: { id: user.id, email: user.email, role: user.role } });
@@ -98,13 +98,11 @@ router.post('/login', (req, res) => {
     return res.status(400).json({ error: 'Invalid credentials' });
   }
 
-  // ✅ Assign 'brand' role to old users without role
   if (!user.role) {
     user.role = 'brand';
-    saveDb(); // persist role
+    saveDb(); // ✅ persist role assignment
   }
 
-  // ✅ Role mismatch check
   if (role && user.role !== role) {
     return res.status(403).json({ error: `Role mismatch: account is '${user.role}', not '${role}'` });
   }
