@@ -98,28 +98,40 @@ router.post('/staff-signup', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { email, password, role } = req.body;
 
-  if (!email || !password) return res.status(400).json({ error: 'Missing email or password' });
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Missing email or password' });
+  }
 
   const normalizedEmail = email.trim().toLowerCase();
   const users = getUsers();
   const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
 
-  if (!user) return res.status(400).json({ error: 'Invalid credentials' });
-
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(400).json({ error: 'Invalid credentials' });
-
-  if (!user.role) {
-    user.role = 'brand';
-    saveDb();
+  if (!user) {
+    return res.status(400).json({ error: 'Invalid email or password' });
   }
 
-  if (role && user.role !== role) {
-    return res.status(403).json({ error: `Role mismatch: account is '${user.role}', not '${role}'` });
+  const validPassword = await bcrypt.compare(password, user.password);
+  if (!validPassword) {
+    return res.status(400).json({ error: 'Invalid email or password' });
+  }
+
+  // ✅ Check role only if client provided it, but do not overwrite saved role
+  if (role && user.role && user.role.toLowerCase() !== role.toLowerCase()) {
+    return res.status(403).json({ error: `Role mismatch: account is '${user.role}'` });
+  }
+
+  // If user has no role (legacy data), default to brand
+  if (!user.role) {
+    user.role = 'brand';
+    saveDb(); // persist once, not on every login
   }
 
   const token = generateToken(user);
-  res.json({ success: true, token, user: { id: user.id, email: user.email, role: user.role } });
+  return res.json({
+    success: true,
+    token,
+    user: { id: user.id, email: user.email, role: user.role }
+  });
 });
 
 // ================== REQUEST PASSWORD RESET ==================

@@ -1,3 +1,4 @@
+// data/store.js
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -6,6 +7,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const dbPath = path.join(__dirname, 'db.json');
+console.log("📂 Using DB path:", dbPath);
+
 
 // ------------------ Internal Load/Save ------------------
 function load() {
@@ -16,7 +19,7 @@ function load() {
   try {
     return JSON.parse(raw);
   } catch (err) {
-    console.error('Failed to parse db.json, starting fresh', err);
+    console.error('⚠️ Failed to parse db.json, starting fresh:', err);
     return { users: [], brands: [], projects: [], otps: [] };
   }
 }
@@ -58,7 +61,7 @@ export function getOtps() {
 export function addUser(user) {
   if (!db.users) db.users = [];
   db.users.push(user);
-  saveDb(); // ✅ always persist immediately
+  saveDb();
 }
 
 export function addBrand(brand) {
