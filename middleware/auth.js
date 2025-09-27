@@ -1,6 +1,6 @@
 // middleware/auth.js
 import jwt from 'jsonwebtoken';
-import User from '../data/models/user.js';
+import User from '../data/models/User.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'devsupersecret';
 
