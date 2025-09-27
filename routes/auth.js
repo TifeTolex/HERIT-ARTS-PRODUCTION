@@ -3,8 +3,8 @@ import express from 'express';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { getUsers, addUser, saveDb } from '../data/store.js';
 import { sendWelcomeEmail, sendPasswordResetEmail } from '../utils/email.js';
+import User from '../data/models/User.js'; // Mongoose User model
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'devsupersecret';
@@ -12,7 +12,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'devsupersecret';
 // Helper to generate JWT
 function generateToken(user) {
   return jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
+    { id: user._id, email: user.email, role: user.role },
     JWT_SECRET,
     { expiresIn: '7d' }
   );
@@ -27,14 +27,14 @@ router.post('/signup', async (req, res) => {
   }
 
   const normalizedEmail = email.trim().toLowerCase();
-  if (getUsers().some(u => u.email.toLowerCase() === normalizedEmail)) {
+  const existingUser = await User.findOne({ email: normalizedEmail });
+  if (existingUser) {
     return res.status(400).json({ error: 'User already exists' });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = {
-    id: crypto.randomUUID(),
+  const user = new User({
     firstName,
     lastName,
     email: normalizedEmail,
@@ -51,15 +51,15 @@ router.post('/signup', async (req, res) => {
       projects: [],
       history: []
     }
-  };
+  });
 
-  addUser(user);
+  await user.save();
 
-  // Send welcome email (non-blocking)
+  // Send welcome email (temporarily disabled or mocked)
   sendWelcomeEmail(user.email, user.firstName).catch(err => console.error('Email error:', err));
 
   const token = generateToken(user);
-  res.json({ success: true, token, user: { id: user.id, email: user.email, role: user.role } });
+  res.json({ success: true, token, user: { id: user._id, email: user.email, role: user.role } });
 });
 
 // ================== STAFF SIGNUP ==================
@@ -71,67 +71,47 @@ router.post('/staff-signup', async (req, res) => {
   }
 
   const normalizedEmail = email.trim().toLowerCase();
-  if (getUsers().some(u => u.email.toLowerCase() === normalizedEmail)) {
+  const existingUser = await User.findOne({ email: normalizedEmail });
+  if (existingUser) {
     return res.status(400).json({ error: 'User already exists' });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = {
-    id: crypto.randomUUID(),
+  const user = new User({
     firstName,
     lastName,
     email: normalizedEmail,
     password: hashedPassword,
     role: 'staff'
-  };
+  });
 
-  addUser(user);
+  await user.save();
 
   sendWelcomeEmail(user.email, user.firstName).catch(err => console.error('Email error:', err));
 
   const token = generateToken(user);
-  res.json({ success: true, token, user: { id: user.id, email: user.email, role: user.role } });
+  res.json({ success: true, token, user: { id: user._id, email: user.email, role: user.role } });
 });
 
 // ================== LOGIN ==================
 router.post('/login', async (req, res) => {
   const { email, password, role } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Missing email or password' });
-  }
+  if (!email || !password) return res.status(400).json({ error: 'Missing email or password' });
 
   const normalizedEmail = email.trim().toLowerCase();
-  const users = getUsers();
-  const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
-
-  if (!user) {
-    return res.status(400).json({ error: 'Invalid email or password' });
-  }
+  const user = await User.findOne({ email: normalizedEmail });
+  if (!user) return res.status(400).json({ error: 'Invalid email or password' });
 
   const validPassword = await bcrypt.compare(password, user.password);
-  if (!validPassword) {
-    return res.status(400).json({ error: 'Invalid email or password' });
-  }
+  if (!validPassword) return res.status(400).json({ error: 'Invalid email or password' });
 
-  // ✅ Check role only if client provided it, but do not overwrite saved role
-  if (role && user.role && user.role.toLowerCase() !== role.toLowerCase()) {
+  if (role && user.role.toLowerCase() !== role.toLowerCase()) {
     return res.status(403).json({ error: `Role mismatch: account is '${user.role}'` });
   }
 
-  // If user has no role (legacy data), default to brand
-  if (!user.role) {
-    user.role = 'brand';
-    saveDb(); // persist once, not on every login
-  }
-
   const token = generateToken(user);
-  return res.json({
-    success: true,
-    token,
-    user: { id: user.id, email: user.email, role: user.role }
-  });
+  return res.json({ success: true, token, user: { id: user._id, email: user.email, role: user.role } });
 });
 
 // ================== REQUEST PASSWORD RESET ==================
@@ -140,16 +120,12 @@ router.post('/request-password-reset', async (req, res) => {
   if (!email) return res.status(400).json({ error: 'Email is required' });
 
   const normalizedEmail = email.trim().toLowerCase();
-  const users = getUsers();
-  const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
+  const user = await User.findOne({ email: normalizedEmail });
 
-  if (!user) {
-    // Don't reveal if user exists
-    return res.json({ success: true, message: 'If the email exists, a reset link has been sent.' });
-  }
+  // Always return success message to avoid revealing accounts
+  if (!user) return res.json({ success: true, message: 'If the email exists, a reset link has been sent.' });
 
-  const resetToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '15m' });
-
+  const resetToken = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '15m' });
   sendPasswordResetEmail(user.email, resetToken).catch(err => console.error('Failed to send reset email:', err));
 
   res.json({ success: true, message: 'If the email exists, a reset link has been sent.' });
@@ -158,17 +134,15 @@ router.post('/request-password-reset', async (req, res) => {
 // ================== RESET PASSWORD ==================
 router.post('/reset-password', async (req, res) => {
   const { token, newPassword } = req.body;
-
   if (!token || !newPassword) return res.status(400).json({ error: 'Missing token or new password' });
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    const users = getUsers();
-    const user = users.find(u => u.id === decoded.id && u.email === decoded.email);
+    const user = await User.findOne({ _id: decoded.id, email: decoded.email });
     if (!user) return res.status(400).json({ error: 'Invalid token or user not found' });
 
     user.password = await bcrypt.hash(newPassword, 10);
-    saveDb();
+    await user.save();
 
     res.json({ success: true, message: 'Password reset successfully. You can now log in.' });
   } catch (err) {

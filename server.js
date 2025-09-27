@@ -5,6 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -19,7 +20,7 @@ const app = express();
 
 // ================== Middleware ==================
 app.use(cors({
-  origin: '*', // In production, you can restrict this to your domain
+  origin: '*', // In production, restrict this to your domain
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -40,12 +41,9 @@ app.use('/api/brands', brandRoutes);
 app.use('/api/projects', projectRoutes);
 
 // ================== Health Check ==================
-app.get('/api/health', (req, res) =>
-  res.json({ ok: true, time: new Date().toISOString() })
-);
+app.get('/api/health', (req, res) => res.json({ ok: true, time: new Date().toISOString() }));
 
 // ================== Frontend Fallback ==================
-// If no API or static file matches, send index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -54,6 +52,22 @@ app.get('*', (req, res) => {
 app.use((err, req, res, next) => {
   console.error('🔥 Server Error:', err.stack);
   res.status(500).json({ error: 'Internal Server Error' });
+});
+
+// ================== MongoDB Connection ==================
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/content-ad';
+
+mongoose.connect(MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+mongoose.connection.on('connected', () => {
+  console.log('✅ Connected to MongoDB');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('❌ MongoDB connection error:', err);
 });
 
 // ================== Start Server ==================
