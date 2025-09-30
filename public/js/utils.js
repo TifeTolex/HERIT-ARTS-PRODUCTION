@@ -113,3 +113,21 @@ export function requireAuthOrRedirect(){
 }
 
 export function logout(){ clearToken(); window.location.href = '/login.html'; }
+
+// =====================
+// TRIAL CHECK
+// =====================
+export function checkTrial() {
+  const trialEndsAt = localStorage.getItem('trialEndsAt');
+  const subStatus = localStorage.getItem('subscriptionStatus');
+
+  if (!trialEndsAt) return; // no trial info, skip
+
+  const expiry = new Date(trialEndsAt);
+  const now = new Date();
+
+  if (now > expiry && subStatus !== 'active') {
+    showToast('Your trial has ended. Please subscribe to continue.', 'warning', 5000);
+    setTimeout(() => { window.location.href = '/subscribe.html'; }, 2000);
+  }
+}

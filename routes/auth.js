@@ -51,15 +51,24 @@ router.post('/signup', async (req, res) => {
       projects: [],
       history: []
     }
+    // ⚡ trialEndsAt is auto-set in the schema
   });
 
   await user.save();
 
-  // Send welcome email (temporarily disabled or mocked)
   sendWelcomeEmail(user.email, user.firstName).catch(err => console.error('Email error:', err));
 
   const token = generateToken(user);
-  res.json({ success: true, token, user: { id: user._id, email: user.email, role: user.role } });
+  res.json({
+    success: true,
+    token,
+    user: {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+      trialEndsAt: user.trialEndsAt
+    }
+  });
 });
 
 // ================== STAFF SIGNUP ==================
@@ -84,6 +93,7 @@ router.post('/staff-signup', async (req, res) => {
     email: normalizedEmail,
     password: hashedPassword,
     role: 'staff'
+    // trialEndsAt is still auto-set
   });
 
   await user.save();
@@ -91,7 +101,16 @@ router.post('/staff-signup', async (req, res) => {
   sendWelcomeEmail(user.email, user.firstName).catch(err => console.error('Email error:', err));
 
   const token = generateToken(user);
-  res.json({ success: true, token, user: { id: user._id, email: user.email, role: user.role } });
+  res.json({
+    success: true,
+    token,
+    user: {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+      trialEndsAt: user.trialEndsAt
+    }
+  });
 });
 
 // ================== LOGIN ==================
@@ -111,7 +130,16 @@ router.post('/login', async (req, res) => {
   }
 
   const token = generateToken(user);
-  return res.json({ success: true, token, user: { id: user._id, email: user.email, role: user.role } });
+  return res.json({
+    success: true,
+    token,
+    user: {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+      trialEndsAt: user.trialEndsAt
+    }
+  });
 });
 
 // ================== REQUEST PASSWORD RESET ==================
@@ -122,7 +150,6 @@ router.post('/request-password-reset', async (req, res) => {
   const normalizedEmail = email.trim().toLowerCase();
   const user = await User.findOne({ email: normalizedEmail });
 
-  // Always return success message to avoid revealing accounts
   if (!user) return res.json({ success: true, message: 'If the email exists, a reset link has been sent.' });
 
   const resetToken = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '15m' });

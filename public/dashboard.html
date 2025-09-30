@@ -18,6 +18,7 @@
       background: none;
       border: none;
       cursor: pointer;
+      color: var(--text-color, #000);
     }
 
     @media (max-width: 768px) {
@@ -27,16 +28,20 @@
         position: absolute;
         top: 60px;
         right: 1rem;
-        background: white;
+        background: var(--bg-color, #1e1e1e); /* dark mode background */
         padding: 1rem;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         z-index: 1000;
 
-        /* animation states */
         opacity: 0;
         transform: translateY(-10px);
         transition: all 0.3s ease;
+      }
+
+      .nav-links a,
+      .nav-links button {
+        color: var(--text-color, #fff); /* text visible in dark mode */
       }
 
       .nav-links.active {
@@ -47,11 +52,23 @@
 
       .menu-toggle {
         display: block;
+        color: var(--text-color, #fff);
       }
+
+      .btn.ghost {
+        color: var(--text-color, #fff);
+        border: 1px solid var(--text-color, #fff);
+      }
+    }
+
+    /* Dark mode root variables (optional) */
+    body[data-theme="dark"] {
+      --bg-color: #1e1e1e;
+      --text-color: #ffffff;
     }
   </style>
 </head>
-<body data-page="brand-dashboard">
+<body data-page="brand-dashboard" data-theme="dark">
   <a class="skip-link" href="#main">Skip to content</a>
   <header>
     <nav class="container">
@@ -78,11 +95,10 @@
     <h1>Brand Dashboard</h1>
 
     <!-- KPI Section -->
-    <section class="grid cols-4 mt-2" id="kpis">
+    <section class="grid cols-3 mt-2" id="kpis">
       <div class="card kpi"><div>Active projects</div><div class="num" id="kpiActive">0</div></div>
       <div class="card kpi"><div>Queued</div><div class="num" id="kpiQueued">0</div></div>
       <div class="card kpi"><div>Completed</div><div class="num" id="kpiCompleted">0</div></div>
-      <div class="card kpi"><div>Total</div><div class="num" id="kpiTotal">0</div></div>
     </section>
 
     <!-- Project List -->
@@ -100,8 +116,13 @@
   </main>
 
   <script type="module">
-    import { api, requireAuthOrRedirect, logout, showToast } from '/js/utils.js';
-    requireAuthOrRedirect();
+    import { api, requireAuthOrRedirect, logout, showToast, checkTrial } from '/js/utils.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      requireAuthOrRedirect();
+      checkTrial();
+    });
+
     document.getElementById("logoutBtn").addEventListener("click", logout);
 
     (async () => {
@@ -116,7 +137,6 @@
         document.getElementById('kpiActive').textContent = active;
         document.getElementById('kpiQueued').textContent = queued;
         document.getElementById('kpiCompleted').textContent = completed;
-        document.getElementById('kpiTotal').textContent = total;
 
         // Render project list
         const list = document.getElementById('projectList');
@@ -158,13 +178,9 @@
         notif.innerHTML = statusUpdates.length
           ? statusUpdates.map(n => `<li>${n}</li>`).join('')
           : '<li class="text-muted">No notifications</li>';
-
-        showToast('login succesfull', 'success');
       } catch (err) {
         console.error('Failed to load dashboard', err);
-        showToast('Failed to load dashboard data', 'error');
-
-        ['kpiActive','kpiQueued','kpiCompleted','kpiTotal'].forEach(id => {
+        ['kpiActive','kpiQueued','kpiCompleted'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.textContent = '0';
         });

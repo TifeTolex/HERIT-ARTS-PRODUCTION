@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ---------------- Helper: get current user ----------------
+// ---------------- Helpers ----------------
 async function getCurrentUser(req) {
   const token = req.headers.authorization?.replace('Bearer ', '');
   if (!token) return null;
@@ -37,12 +37,30 @@ async function getCurrentUser(req) {
   }
 }
 
+function hasActiveSubscription(user) {
+  if (!user?.subscription) return false;
+  const { plan, status, trialEndsAt } = user.subscription;
+
+  if (plan && status === 'active') return true;
+
+  if (status === 'trialing' && trialEndsAt) {
+    return new Date(trialEndsAt) > new Date();
+  }
+
+  return false;
+}
+
 // ================= Brand Routes =================
 
 // Create project
 router.post('/', async (req, res) => {
   const me = await getCurrentUser(req);
   if (!me?.brand) return res.status(401).json({ error: 'Unauthorized' });
+
+  // 🚫 subscription enforcement
+  if (!hasActiveSubscription(me)) {
+    return res.status(403).json({ error: 'Subscription required to create projects' });
+  }
 
   const proj = {
     id: crypto.randomUUID(),
@@ -77,6 +95,11 @@ router.post('/:id/upload', upload.array('files'), async (req, res) => {
   const me = await getCurrentUser(req);
   const proj = me?.brand?.projects.find(p => p.id === req.params.id);
   if (!proj) return res.status(404).json({ error: 'Not found' });
+
+  // 🚫 block uploads if no active sub
+  if (!hasActiveSubscription(me)) {
+    return res.status(403).json({ error: 'Subscription required to upload files' });
+  }
 
   const newFiles = req.files.map(f => ({
     url: `/uploads/${f.filename}`,

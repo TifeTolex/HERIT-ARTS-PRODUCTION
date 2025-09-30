@@ -88,7 +88,7 @@ label{ font-weight: 600; font-size: .95rem; }
 /* ===================== STATUS BADGES ===================== */
 .status {
   font-size: .85rem;
-  padding: .3rem .65rem;
+  padding: .2rem .45rem;
   border-radius: 999px;
   font-weight: 600;
   display: inline-block;
@@ -150,6 +150,7 @@ label{ font-weight: 600; font-size: .95rem; }
     --danger: #f87171;
     --success: #4ade80;
     --warning: #fbbf24;
+    
   }
 
   body { background: var(--bg); color: var(--fg); }

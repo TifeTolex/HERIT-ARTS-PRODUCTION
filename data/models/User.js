@@ -11,7 +11,7 @@ const BrandSchema = new mongoose.Schema({
   members: [{ email: String, role: String }],
   subscription: {
     plan: { type: String, default: null },
-    status: { type: String, default: 'none' },
+    status: { type: String, default: 'none' }, // active, canceled, none
     renewsAt: { type: Date, default: null },
     gateway: { type: String, default: null },
   },
@@ -26,6 +26,12 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ['brand', 'staff'], default: 'brand' },
   brand: { type: BrandSchema, default: null },
+
+  // ✅ Trial period support
+  trialEndsAt: {
+    type: Date,
+    default: () => Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days from signup
+  }
 }, { timestamps: true });
 
 const User = mongoose.model('User', UserSchema);

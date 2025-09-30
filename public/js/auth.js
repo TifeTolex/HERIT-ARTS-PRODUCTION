@@ -13,26 +13,31 @@ if (signupForm) {
       password: document.getElementById('password').value,
       businessName: document.getElementById('businessName')?.value.trim() || null,
       industry: document.getElementById('industry')?.value || null,
-      brandColor: document.getElementById('brandColor')?.value || null,
-      typography: document.getElementById('typography')?.value || null,
-      role: document.getElementById('role')?.value || 'brand' // 👈 allow brand/staff
+      role: document.getElementById('role')?.value || 'brand'
     };
 
     try {
-      const { token, role } = await api('/api/auth/signup', { 
+      const { token, user } = await api('/api/auth/signup', { 
         method: 'POST', 
         body: JSON.stringify(data) 
       });
 
       saveToken(token);
-      localStorage.setItem('role', role || data.role);
-      showToast("Signup successful!", "success");
+      localStorage.setItem('role', user.role);
+      if (user.trialEndsAt) {
+        localStorage.setItem('trialEndsAt', user.trialEndsAt);
+      }
 
+      showToast("Signup successful!", "success");
       const planIntent = document.getElementById('planIntent')?.value;
-      window.location.href = (role || data.role) === 'staff'
+
+      window.location.href = user.role === 'staff'
         ? '/staff.html'
         : (planIntent === 'now' ? '/subscriptions.html' : '/dashboard.html');
+
+      signupForm.reset();
     } catch (e) {
+      document.getElementById('password').value = '';
       showToast(e.message || "Signup failed", "error");
     }
   });
@@ -43,28 +48,38 @@ const loginForm = document.getElementById('loginForm');
 if (loginForm) {
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const chosenRole = document.getElementById('role')?.value;
+    const data = {
+      email: document.getElementById('loginEmail').value.trim(),
+      password: document.getElementById('loginPassword').value,
+      role: document.getElementById('loginRole')?.value || null
+    };
 
     try {
-      const { token, role } = await api('/api/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password, role: chosenRole })
+      const { token, user } = await api('/api/auth/login', { 
+        method: 'POST', 
+        body: JSON.stringify(data) 
       });
 
-      const finalRole = role || chosenRole || 'brand';
       saveToken(token);
-      localStorage.setItem('role', finalRole);
+      localStorage.setItem('role', user.role);
+      if (user.trialEndsAt) {
+        localStorage.setItem('trialEndsAt', user.trialEndsAt);
+      }
 
       showToast("Login successful!", "success");
-      window.location.href = finalRole === 'staff' ? '/staff.html' : '/dashboard.html';
-    } catch (err) {
-      showToast(err.message || 'Invalid credentials', "error");
+
+      window.location.href = user.role === 'staff'
+        ? '/staff.html'
+        : '/dashboard.html';
+
+      loginForm.reset();
+    } catch (e) {
+      document.getElementById('loginPassword').value = '';
+      showToast(e.message || "Login failed", "error");
     }
   });
 }
+
 
 // ================== REQUEST PASSWORD RESET ==================
 const resetForm = document.getElementById('resetForm');
@@ -87,4 +102,3 @@ if (resetForm) {
     }
   });
 }
-

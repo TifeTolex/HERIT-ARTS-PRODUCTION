@@ -31,11 +31,11 @@ if (form) {
       title: document.getElementById('name').value.trim(),
       contentType: document.getElementById('contentType').value,
       deadline: document.getElementById('deadline').value,
-      goal: document.getElementById('goal').value,           // ✅ unified key
-      features: document.getElementById('features').value,   // ✅ unified key
-      audience,                                              // ✅ unified key
-      tones,                                                 // ✅ unified key
-      usage,                                                 // ✅ unified key
+      goal: document.getElementById('goal').value,
+      features: document.getElementById('features').value,
+      audience,
+      tones,
+      usage,
       notes: document.getElementById('notes').value,
       assets: {
         colors: (document.getElementById('brandColors')?.value || '')
@@ -47,6 +47,13 @@ if (form) {
     };
 
     try {
+      // 🔹 First, check subscription status before creating project
+      const { subscription } = await api('/api/subscription');
+      if (!subscription || subscription.status !== 'active') {
+        toast('You need an active subscription or trial to create projects.', 'error');
+        return;
+      }
+
       const { project } = await api('/api/projects', { 
         method: 'POST', 
         body: JSON.stringify(data) 
