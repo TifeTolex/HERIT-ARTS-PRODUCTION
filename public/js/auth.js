@@ -1,11 +1,13 @@
 // auth.js
-import { api, saveToken, showToast } from './utils.js';
+import { api, saveToken, showToast, setLoading } from './utils.js';
 
 // ================== SIGNUP ==================
 const signupForm = document.getElementById('signupForm');
 if (signupForm) {
   signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = signupForm.querySelector('button[type="submit"]');
+
     const data = {
       firstName: document.getElementById('firstName').value.trim(),
       lastName: document.getElementById('lastName').value.trim(),
@@ -17,6 +19,8 @@ if (signupForm) {
     };
 
     try {
+      setLoading(btn, true);
+
       const { token, user } = await api('/api/auth/signup', { 
         method: 'POST', 
         body: JSON.stringify(data) 
@@ -37,9 +41,10 @@ if (signupForm) {
 
       signupForm.reset();
     } catch (e) {
-      console.error('[signup] error:', e);
       document.getElementById('password').value = '';
-      showToast(e.message || JSON.stringify(e) || "Signup failed", "error");
+      showToast(e.message || "Signup failed", "error");
+    } finally {
+      setLoading(btn, false);
     }
   });
 }
@@ -49,13 +54,17 @@ const loginForm = document.getElementById('loginForm');
 if (loginForm) {
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = loginForm.querySelector('button[type="submit"]');
+
     const data = {
-      email: document.getElementById('email').value.trim(),
-      password: document.getElementById('password').value,
-      role: document.getElementById('role')?.value || null
+      email: document.getElementById('loginEmail').value.trim(),
+      password: document.getElementById('loginPassword').value,
+      role: document.getElementById('loginRole')?.value || null
     };
 
     try {
+      setLoading(btn, true);
+
       const { token, user } = await api('/api/auth/login', { 
         method: 'POST', 
         body: JSON.stringify(data) 
@@ -75,10 +84,10 @@ if (loginForm) {
 
       loginForm.reset();
     } catch (e) {
-      console.error('[login] error:', e);
       document.getElementById('loginPassword').value = '';
-      // Show server’s error or stringify object
-      showToast(e.message || JSON.stringify(e) || "Login failed", "error");
+      showToast(e.message || "Login failed", "error");
+    } finally {
+      setLoading(btn, false);
     }
   });
 }
@@ -88,10 +97,13 @@ const resetForm = document.getElementById('resetForm');
 if (resetForm) {
   resetForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const btn = resetForm.querySelector('button[type="submit"]');
 
     const email = document.getElementById('rpEmail').value.trim();
 
     try {
+      setLoading(btn, true);
+
       await api('/api/auth/request-password-reset', {
         method: 'POST',
         body: JSON.stringify({ email })
@@ -100,8 +112,9 @@ if (resetForm) {
       showToast('If the email exists, a reset link has been sent.', "success");
       resetForm.reset();
     } catch (err) {
-      console.error('[reset] error:', err);
-      showToast(err.message || JSON.stringify(err) || 'Request failed', "error");
+      showToast(err.message || 'Request failed', "error");
+    } finally {
+      setLoading(btn, false);
     }
   });
 }

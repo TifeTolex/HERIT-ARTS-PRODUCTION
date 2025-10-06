@@ -79,15 +79,15 @@ export function saveToken(token){ localStorage.setItem('token', token); }
 export function getToken(){ return localStorage.getItem('token'); }
 export function clearToken(){ localStorage.removeItem('token'); }
 
-export async function api(path, options = {}){
+// =====================
+// API HELPER (with error toasts)
+// =====================
+export async function api(path, options = {}) {
   const headers = options.headers || {};
   const token = getToken();
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
-    console.log('[api] Using token:', token.slice(0, 10) + '...'); // ✅ debug
-  } else {
-    console.warn('[api] No token found for request to', path); // ✅ debug
   }
 
   if (!(options.body instanceof FormData)) {
@@ -96,14 +96,26 @@ export async function api(path, options = {}){
 
   try {
     const res = await fetch(API_BASE + path, { ...options, headers });
+
     if (!res.ok) {
       const err = await res.json().catch(() => ({ error: res.statusText }));
-      console.error('[api] Request failed', res.status, err); // ✅ debug
-      throw new Error(err.error || 'Request failed');
+      const message = err.error || `Error ${res.status}: ${res.statusText}`;
+
+      // 🔴 Show error toast automatically
+      showToast(message, 'error');
+      throw new Error(message);
     }
-    return res.json();
+
+    const data = await res.json();
+
+    // Optional: show success toast for POST/PUT/DELETE (not GET)
+    if (['POST','PUT','DELETE'].includes((options.method || 'GET').toUpperCase())) {
+      showToast('Action completed successfully', 'success');
+    }
+
+    return data;
   } catch (e) {
-    console.error('[api] Network or server error:', e); // ✅ debug
+    showToast(e.message || 'Network error', 'error');
     throw e;
   }
 }
@@ -130,4 +142,69 @@ export function checkTrial() {
     showToast('Your trial has ended. Please subscribe to continue.', 'warning', 5000);
     setTimeout(() => { window.location.href = '/subscribe.html'; }, 2000);
   }
+  
 }
+// =====================
+// LOADING SPINNER HELPER
+// =====================
+export function setLoading(button, isLoading, textWhenDone = null) {
+  if (!button) return;
+  if (isLoading) {
+    button.disabled = true;
+    button.dataset.originalText = button.innerHTML;
+    button.innerHTML = `
+      <span class="spinner" style="
+        border: 2px solid #fff;
+        border-top: 2px solid transparent;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        margin-right: 6px;
+        animation: spin 0.6s linear infinite;
+        vertical-align: middle;
+      "></span> Processing...
+    `;
+  } else {
+    button.disabled = false;
+    button.innerHTML = button.dataset.originalText || textWhenDone || 'Submit';
+  }
+}
+
+// Add spin animation globally if not present
+if (!document.querySelector('#spinner-style')) {
+  const style = document.createElement('style');
+  style.id = 'spinner-style';
+  style.textContent = `
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }`;
+  document.head.appendChild(style);
+}
+
+
+// Add spin animation globally if not present
+const style = document.createElement('style');
+style.textContent = `
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+`;
+document.head.appendChild(style);
+
+// =====================
+// AUTO SPINNER FOR ALL FORMS
+// =====================
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('form').forEach(form => {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (!submitBtn) return;
+
+    form.addEventListener('submit', () => {
+      setLoading(submitBtn, true);
+      // Button will reset when page reloads, or manually call setLoading(btn, false) in JS after async work
+    });
+  });
+});

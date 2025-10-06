@@ -27,7 +27,7 @@ body{
 .container{ max-width: var(--maxw); margin: 0 auto; padding: 1rem; }
 header{ background: var(--bg); border-bottom: 1px solid #e5e7eb; position: sticky; top:0; z-index: 10; }
 nav{ display: flex; align-items: center; gap: 1rem; justify-content: space-between; padding: 0.5rem 1rem; }
-nav a{ text-decoration: none; color: var(--fg); padding: .5rem .75rem; border-radius: 10px; transition: background .2s; }
+nav a{ text-decoration: none; color: var(--fg); padding: .5rem .5rem; border-radius: 10px;margin-top: .2rem; transition: background .2s; }
 nav a[aria-current="page"], nav a:hover{ background: var(--surface); }
 .logo{ display: inline-flex; align-items: center; gap: .5rem; font-weight: 700; }
 
@@ -63,7 +63,7 @@ h3{ font-size: clamp(1.1rem, 2vw, 1.25rem); }
   margin-bottom: .5rem;
   background: var(--primary); color: var(--primary-contrast);
   border:none; border-radius: 12px; cursor: pointer;
-  transition: background .2s, opacity .2s;
+  transition:  .2s, opacity .2s;
 }
 .btn:hover{ background: #1e4ed8; }
 .btn.secondary{ background: #111827; color:white; }
@@ -246,5 +246,101 @@ html[data-theme="dark"] .table th { background: #334155; }
 }
 @keyframes toast-out {
   to { opacity:0; transform:translateY(-10px); }
+}
+
+/* Slideshow container */
+.slideshow-container {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* full screen height */
+  overflow: hidden;
+}
+
+.mySlides {
+  display: none;
+  height: 100%;
+}
+
+.mySlides img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Arrows */
+.prev, .next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  color: white;
+  font-size: 24px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 50%;
+  user-select: none;
+  z-index: 3;
+}
+
+.prev { left: 20px; }
+.next { right: 20px; }
+
+.prev:hover, .next:hover {
+  background: rgba(0,0,0,0.7);
+}
+
+/* Hero text overlay */
+.hero-text {
+  position: absolute;
+  top: 20%; /* slightly lower so arrows don’t overlap */
+  left: 5%;
+  color: white;
+  text-align: left;
+  max-width: 600px;
+  z-index: 2;
+}
+
+.hero-text h1 {
+  font-size: 3rem;
+  margin: 0;
+}
+
+.hero-text p {
+  font-size: 1.2rem;
+  margin: 1rem 0;
+}
+
+.hero-text .btn {
+  margin-right: 10px;
+}
+
+/* Gradient overlay for better text visibility */
+.slideshow-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0));
+  z-index: 1;
+}
+
+/* Dots (indicators) */
+.dots .dot {
+  cursor: pointer;
+  height: 12px;
+  width: 12px;
+  margin: 0 5px;
+  background-color: rgba(255,255,255,0.6);
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.3s;
+}
+.dots .dot.active {
+  background-color: white;
 }
 
