@@ -24,7 +24,7 @@ body{
   line-height: 1.55;
 }
 
-.container{ max-width: var(--maxw); margin: 0 auto; padding: 1rem; }
+.container{ max-width: var(--maxw); margin: 0 auto; padding: 1rem irem; }
 header{ background: var(--bg); border-bottom: 1px solid #e5e7eb; position: sticky; top:0; z-index: 10; }
 nav{ display: flex; align-items: center; gap: 1rem; justify-content: space-between; padding: 0.5rem 1rem; }
 nav a{ text-decoration: none; color: var(--fg); padding: .5rem .5rem; border-radius: 10px;margin-top: .2rem; transition: background .2s; }
@@ -107,7 +107,7 @@ label{ font-weight: 600; font-size: .95rem; }
   background:#f0fdf4; color:#166534; border:1px solid #86efac;
 }
 
-.footer{ border-top:1px solid #e5e7eb; color: var(--muted); padding: 2rem 1rem; font-size:.9rem; }
+.footer{ border-top:1px solid #e5e7eb; color: var(--muted); padding: 1rem 1rem; font-size:.9rem; }
 .skip-link{ position:absolute; left:-999px; }
 .skip-link:focus{ left: .5rem; top:.5rem; background: #111827; color:white; padding:.5rem 1rem; border-radius: 8px; }
 

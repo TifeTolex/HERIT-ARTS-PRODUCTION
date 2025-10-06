@@ -57,9 +57,9 @@ if (loginForm) {
     const btn = loginForm.querySelector('button[type="submit"]');
 
     const data = {
-      email: document.getElementById('loginEmail').value.trim(),
-      password: document.getElementById('loginPassword').value,
-      role: document.getElementById('loginRole')?.value || null
+      email: document.getElementById('email').value.trim(),
+      password: document.getElementById('password').value,
+      role: document.getElementById('role')?.value || null
     };
 
     try {
