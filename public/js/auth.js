@@ -37,8 +37,9 @@ if (signupForm) {
 
       signupForm.reset();
     } catch (e) {
+      console.error('[signup] error:', e);
       document.getElementById('password').value = '';
-      showToast(e.message || "Signup failed", "error");
+      showToast(e.message || JSON.stringify(e) || "Signup failed", "error");
     }
   });
 }
@@ -74,12 +75,13 @@ if (loginForm) {
 
       loginForm.reset();
     } catch (e) {
+      console.error('[login] error:', e);
       document.getElementById('loginPassword').value = '';
-      showToast(e.message || "Login failed", "error");
+      // Show server’s error or stringify object
+      showToast(e.message || JSON.stringify(e) || "Login failed", "error");
     }
   });
 }
-
 
 // ================== REQUEST PASSWORD RESET ==================
 const resetForm = document.getElementById('resetForm');
@@ -98,7 +100,8 @@ if (resetForm) {
       showToast('If the email exists, a reset link has been sent.', "success");
       resetForm.reset();
     } catch (err) {
-      showToast(err.message || 'Request failed', "error");
+      console.error('[reset] error:', err);
+      showToast(err.message || JSON.stringify(err) || 'Request failed', "error");
     }
   });
 }

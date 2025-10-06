@@ -4,13 +4,86 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Content Advertisement Platform</title>
-  <meta name="description" content="Subscribe to professional content creation. Submit briefs, track projects, and review deliveries." />
-  <meta property="og:title" content="Content Advertisement Platform" />
-  <meta property="og:description" content="A simple platform for brands to submit briefs and get content delivered." />
   <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Slideshow container */
+    .slideshow-container {
+      position: relative;
+      width: 100%;
+      height: 100vh; /* Full viewport height */
+      overflow: hidden;
+    }
+    .mySlides {
+      display: none;
+      height: 100%;
+    }
+    .mySlides img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .slideshow-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0));
+  z-index: 1;
+}
+.hero-text {
+  position: absolute;
+  top: 25%;
+  left: 5%;
+  color: white;
+  text-align: left;
+  max-width: 600px;
+  z-index: 2; /* make sure text is above overlay */
+}
+
+    /* Arrows */
+    .prev, .next {
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 16px;
+      color: white;
+      font-weight: bold;
+      font-size: 32px;
+      user-select: none;
+      background: rgba(0,0,0,0.4);
+      border-radius: 50%;
+    }
+    .next { right: 20px; }
+    .prev { left: 20px; }
+    .prev:hover, .next:hover {
+      background: rgba(0,0,0,0.7);
+    }
+    /* Hero text overlay */
+    .hero-text {
+      position: absolute;
+      top: 25%;
+      left: 5%;
+      color: white;
+      text-align: left;
+      max-width: 600px;
+    }
+    .hero-text h1 {
+      font-size: 3rem;
+      margin: 0;
+    }
+    .hero-text p {
+      font-size: 1.2rem;
+      margin: 1rem 0;
+    }
+    .hero-text .btn {
+      margin-right: 10px;
+    }
+  </style>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
   <header>
     <nav class="container">
       <div class="logo">
@@ -24,41 +97,58 @@
     </nav>
   </header>
 
-  <main id="main" class="container">
-    <section class="grid cols-2 mt-3">
-      <div>
-        <h1>H'Art PRoduction </h1>
-        <p class="text-muted">Create a brief, pick a plan, and receive ready-to-use content from our production team.</p>
-        <div class="mt-2">
-          <a href="signup.html" class="btn">Create your brand account</a>
-          <a href="login.html" class="btn ghost">I already have an account</a>
-        </div>
-        <ul class="mt-2">
-          <li>Structured briefs capture goals, tone, audience, and assets.</li>
-          <li>Dashboard shows active and queued projects.</li>
-          <li>Review and approve delivered content.</li>
-          <li>Invite teammates and manage roles.</li>
-        </ul>
-      </div>
+  <!-- 🔹 Slideshow Hero -->
+  <div class="slideshow-container">
+    <div class="mySlides"><img src="assets/slide1.jpg" alt="Slide 1"></div>
+    <div class="mySlides"><img src="assets/slide2.jpg" alt="Slide 2"></div>
+    <div class="mySlides"><img src="assets/slide3.jpg" alt="Slide 3"></div>
 
-      <!-- <div class="card">
-        <h3>What’s inside</h3>
-        <ul>
-          <li>Subscriptions & payments</li>
-          <li>Project intake & asset uploads</li>
-          <li>Production workflow & delivery</li>
-          <li>Analytics for brands & staff</li>
-        </ul>
-        <p class="mt-1"><a class="btn" href="subscriptions.html">View plans</a></p>
-      </div> -->
-    </section>
-  </main>
+    <!-- Hero text overlay -->
+    <div class="hero-text">
+      <h1>H’Art Production</h1>
+      <p>Create a brief, pick a plan, and receive ready-to-use content from our production team.</p>
+      <a href="signup.html" class="btn">Create your brand account</a>
+      <a href="login.html" class="btn ghost">I already have an account</a>
+      <ul>
+        <li>Structured briefs capture goals, tone, audience, and assets.</li>
+        <li>Dashboard shows active and queued projects.</li>
+        <li>Review and approve delivered content.</li>
+        <li>Invite teammates and manage roles.</li>
+      </ul>
+    </div>
+
+    <!-- Navigation arrows -->
+    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+    <a class="next" onclick="plusSlides(1)">&#10095;</a>
+  </div>
 
   <footer class="footer center">
     © <span id="year"></span> Content Ads — All rights reserved.
   </footer>
+
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    let slideIndex = 0;
+    showSlides();
+
+    function showSlides() {
+      let i;
+      let slides = document.getElementsByClassName("mySlides");
+      for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+      }
+      slideIndex++;
+      if (slideIndex > slides.length) {slideIndex = 1}
+      slides[slideIndex-1].style.display = "block";
+      setTimeout(showSlides, 5000); // auto change every 5s
+    }
+
+    function plusSlides(n) {
+      slideIndex += n-1; // adjust for auto increment
+      if (slideIndex < 0) {slideIndex = 0;}
+      showSlides();
+    }
   </script>
 </body>
 </html>

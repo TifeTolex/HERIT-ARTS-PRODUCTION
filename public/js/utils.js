@@ -85,9 +85,9 @@ export async function api(path, options = {}){
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
-    console.log('[api] Using token:', token.slice(0, 10) + '...'); // ✅ debug
+    console.log('[api] Using token:', token.slice(0, 10) + '...'); 
   } else {
-    console.warn('[api] No token found for request to', path); // ✅ debug
+    console.warn('[api] No token found for request to', path); 
   }
 
   if (!(options.body instanceof FormData)) {
@@ -96,14 +96,23 @@ export async function api(path, options = {}){
 
   try {
     const res = await fetch(API_BASE + path, { ...options, headers });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: res.statusText }));
-      console.error('[api] Request failed', res.status, err); // ✅ debug
-      throw new Error(err.error || 'Request failed');
+    let text = await res.text();
+    let data;
+
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { error: text }; // fallback if server sends plain text
     }
-    return res.json();
+
+    if (!res.ok) {
+      console.error('[api] Request failed', res.status, data);
+      throw new Error(`${res.status} ${res.statusText}: ${data.error || text}`);
+    }
+
+    return data;
   } catch (e) {
-    console.error('[api] Network or server error:', e); // ✅ debug
+    console.error('[api] Network or server error:', e);
     throw e;
   }
 }
@@ -121,7 +130,7 @@ export function checkTrial() {
   const trialEndsAt = localStorage.getItem('trialEndsAt');
   const subStatus = localStorage.getItem('subscriptionStatus');
 
-  if (!trialEndsAt) return; // no trial info, skip
+  if (!trialEndsAt) return;
 
   const expiry = new Date(trialEndsAt);
   const now = new Date();
