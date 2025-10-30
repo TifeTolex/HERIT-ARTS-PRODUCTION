@@ -7,14 +7,22 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to content</a>
+  <!-- <a class="skip-link" href="#main">Skip to content</a> -->
   <header>
     <nav class="container">
       <div class="logo">
         <img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" />
         <span>Content Ads</span>
       </div>
-      <div>
+
+        <!-- Hamburger button -->
+    <div class="menu-toggle" id="menuToggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+      <div class="nav-links" id="navLinks">
         <a href="index.html">Home</a>
         <a href="login.html">Login</a>
       </div>
@@ -89,5 +97,24 @@
   </main>
 
   <script type="module" src="js/auth.js"></script>
+
+  <script>
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinks = document.getElementById('navLinks');
+
+  menuToggle.addEventListener('click', () => {
+    menuToggle.classList.toggle('active');
+    navLinks.classList.toggle('active');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+      menuToggle.classList.remove('active');
+      navLinks.classList.remove('active');
+    }
+  });
+</script>
+
 </body>
 </html>
