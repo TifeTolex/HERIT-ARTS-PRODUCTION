@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard — Content Ads</title>
   <link rel="stylesheet" href="css/styles.css">
-  <style>
+  <!-- <style>
     /* --- Responsive nav upgrade with animation --- */
     .nav-links {
       display: flex;
@@ -66,10 +66,10 @@
       --bg-color: #1e1e1e;
       --text-color: #ffffff;
     }
-  </style>
+  </style> -->
 </head>
 <body data-page="brand-dashboard" data-theme="dark">
-  <a class="skip-link" href="#main">Skip to content</a>
+  <!-- <a class="skip-link" href="#main">Skip to content</a> -->
   <header>
     <nav class="container">
       <div class="logo">
@@ -77,11 +77,15 @@
         <span>Content Ads</span>
       </div>
 
-      <!-- Mobile menu toggle -->
-      <button class="menu-toggle" aria-label="Toggle menu">☰</button>
+        
+             <!-- Hamburger button -->
+    <div class="menu-toggle" id="menuToggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
 
-      <!-- Navigation links -->
-      <div class="nav-links">
+      <div class="nav-links" id="navLinks">
         <a href="dashboard.html" aria-current="page">Dashboard</a>
         <a href="projects.html">Projects</a>
         <a href="team.html">Team</a>
@@ -89,6 +93,12 @@
         <button class="btn ghost" id="logoutBtn">Logout</button>
       </div>
     </nav>
+
+      <!-- Mobile menu toggle
+      <button class="menu-toggle" aria-label="Toggle menu">☰</button> -->
+
+      <!-- Navigation links -->
+  
   </header>
 
   <main id="main" class="container">
