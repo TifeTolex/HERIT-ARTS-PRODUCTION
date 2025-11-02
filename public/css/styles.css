@@ -159,15 +159,16 @@ nav a:hover {
   margin: 0 0 10px;
   text-transform: uppercase;
   line-height: 1.3;
+  font-weight: 900;
+  line-height: 1.2;
   font-weight: 700;
-  background: white;
-  background: radial-gradient( #d6cbf5e8, #ffffff );
+  background: linear-gradient(90deg, #60a5fa, #c084fc);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .hero-text {
-  position: absolute;
+  
   inset: 0;
   display: flex;
   flex-direction: column;
@@ -175,6 +176,9 @@ nav a:hover {
   padding: 30vh 20px ;
   text-align: center;
   z-index: 10;
+    position: relative;
+  z-index: 2;
+  max-width: 700px;
 }
 
 .hero-text p {
@@ -798,20 +802,8 @@ nav.container {
   padding: 0 20px;
 }
 
-.hero-text {
-  position: relative;
-  z-index: 2;
-  max-width: 700px;
-}
 
-.hero-text h1 {
-  font-size: 2.8rem;
-  line-height: 1.2;
-  font-weight: 700;
-  background: linear-gradient(90deg, #60a5fa, #c084fc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+
 
 .hero-text p {
   margin-top: 18px;
@@ -947,7 +939,7 @@ nav.container {
 /* 🔹 Responsive */
 @media (max-width: 768px) {
   .hero-text h1 {
-    font-size: 2.2rem;
+  
   }
 
   .hero-text p {
@@ -1037,7 +1029,6 @@ nav.container {
 /* ensure hero content sits above icons */
 .hero-inner { position: relative; z-index: 2; max-width: 920px; margin: 0 auto; text-align:center; padding: 40px 20px; }
 .hero-text h1 {
-  font-size: 2.4rem;
   line-height: 1.05;
   margin-bottom: 14px;
   color: #081127;
@@ -1059,7 +1050,7 @@ nav.container {
 
 /* responsive tweaks */
 @media (min-width:900px) {
-  .hero-text h1 { font-size: 3.4rem; }
+  .hero-text h1 { font-size: clamp(40px, 6vw, 64px); }
   .hero-actions { flex-direction: row; margin-top: 22px; }
   .btn-new { padding: 12px 26px; font-size: 1rem; }
 }
@@ -1073,7 +1064,112 @@ nav.container {
   .icon.i3 { left: 12%; top: 54%; }
   .icon.i4 { left: 60%; top: 64%; }
   .icon.i5 { left: 44%; top: 6%; }
-  .hero-text h1 { font-size: 1.6rem; }
+  .hero-text h1 { font-size: clamp(40px, 6vw, 64px); }
   .lead { font-size: 0.98rem; }
   .hero-actions { gap: 10px; }
+}
+
+/* CTA / Plans Section */
+.cta-section {
+  position: relative;
+  padding: 5rem 1rem;
+  color: #fff;
+  background: #0d0d0d;
+  overflow: hidden;
+}
+
+.cta-section h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.cta-section p {
+  opacity: 0.85;
+}
+
+/* Floating gradient blobs background */
+.gradient-blobs::before,
+.gradient-blobs::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.2;
+  z-index: 0;
+  animation: floatBlob 10s ease-in-out infinite alternate;
+}
+
+.gradient-blobs::before {
+  background: #ff0080;
+  top: 20%;
+  left: 10%;
+}
+
+.gradient-blobs::after {
+  background: #ff8c00;
+  bottom: 15%;
+  right: 15%;
+}
+
+@keyframes floatBlob {
+  from { transform: translateY(0px) scale(1); }
+  to { transform: translateY(-20px) scale(1.1); }
+}
+
+/* Pricing Cards */
+.plans-grid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  z-index: 2;
+  position: relative;
+}
+
+.plan-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem 2rem;
+  min-width: 220px;
+  transition: 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.plan-card:hover {
+  transform: translateY(-6px);
+  border-color: #ff0080;
+}
+
+.plan-card.highlight {
+  background: linear-gradient(135deg, #ff0080 0%, #ff8c00 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 0 25px rgba(255, 0, 128, 0.3);
+}
+
+/* Explore Button */
+.explore-btn {
+  display: inline-block;
+  margin-top: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.explore-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #ff0080, #ff8c00, #ff0080);
+  opacity: 0;
+  transition: opacity 0.3s;
+  filter: blur(8px);
+  z-index: -1;
+}
+
+.explore-btn:hover::after {
+  opacity: 1;
 }
