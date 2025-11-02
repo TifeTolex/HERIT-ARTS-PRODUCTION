@@ -17,6 +17,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+
 
   <link rel="stylesheet" href="css/styles.css" />
 </head>
@@ -27,7 +29,14 @@
         <img src="assets/logo-placeholder.svg" alt="H'ARTs Studio Logo" width="32" height="32" />
         <span>H'ARTs STUDIO</span>
       </div>
-      <div class="nav-links">
+
+            <!-- Hamburger button -->
+    <div class="menu-toggle" id="menuToggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+      <div class="nav-links" id="navLinks">
         <a href="#features">Features</a>
         <a href="#plans">Pricing</a>
         <a href="#about">About</a>
@@ -90,7 +99,7 @@
   <!-- 🔹 Features Section -->
   <section id="features" class="features-section">
     <div class="container">
-      <h2>Why Choose H'ARTs Studio</h2>
+      <h2>Why Choose H'ARTs Studio?</h2>
       <div class="features-grid">
         <div class="feature-card">
           <h3>🎯 Structured Briefs</h3>
@@ -134,7 +143,7 @@
       </div>
     </div>
 
-    <a href="signup.html" class="btn-new explore-btn">Explore Plans</a>
+    <a href="signup.html" class="explore-btn">Explore Plans</a>
   </div>
 </section>
 
@@ -169,5 +178,33 @@
       particlesContainer.appendChild(p);
     }
   </script>
+
+   <script>
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinks = document.getElementById('navLinks');
+
+  menuToggle.addEventListener('click', () => {
+    menuToggle.classList.toggle('active');
+    navLinks.classList.toggle('active');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+      menuToggle.classList.remove('active');
+      navLinks.classList.remove('active');
+    }
+  });
+</script>
+
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 800,
+    easing: 'ease-in-out',
+    once: true,
+  });
+</script>
+
 </body>
 </html>
