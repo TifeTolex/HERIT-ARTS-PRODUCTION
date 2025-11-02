@@ -3,19 +3,35 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Content Advertisement Platform</title>
+  <title>H'ARTs Studio — Creative Content & Advertising</title>
+
+  <!-- ✅ SEO & Meta -->
+  <meta name="description" content="Create engaging visual and written content effortlessly. H'ARTs Studio connects your brand with top creative talent to produce high-impact advertising materials." />
+  <meta name="keywords" content="content creation, advertising, branding, digital marketing, creative studio" />
+  <meta name="author" content="H'ARTs Studio" />
+
+  <!-- ✅ Favicon -->
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+
+  <!-- ✅ Fonts & Styles -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
   <header>
     <nav class="container">
       <div class="logo">
-        <img src="assets/logo-placeholder.svg" alt="Content Ads" width="28" height="28" />
+        <img src="assets/logo-placeholder.svg" alt="H'ARTs Studio Logo" width="32" height="32" />
         <span>H'ARTs STUDIO</span>
       </div>
-      <div>
-        <!-- <a href="login.html">Login</a> -->
-        <a href="login.html" class="btn btn-top">Login</a> 
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#plans">Pricing</a>
+        <a href="#about">About</a>
+        <a href="login.html" class="btn btn-top">Login</a>
       </div>
     </nav>
   </header>
@@ -25,56 +41,76 @@
     <div class="particles"></div>
     <div class="hero-overlay"></div>
     <div class="hero-text">
-      <h1>CONTENT ADVERTISEMENT WEBSITE</h1>
-      <p>Create a brief, pick a plan, and receive ready-to-use content from our production team.</p>
-     
+      <h1>Bring Your Ideas to Life</h1>
+      <p>
+        From content briefs to finished visuals — collaborate with our creative team and get content that elevates your brand.
+      </p>
       <div class="hero-actions">
-          <!-- Get Started Button -->
-  <a href="signup.html" class="btn-new">Get Started</a>
-  <!--Login Text -->
-  <p class="login-text">
-    Already have an account? <a href="login.html">Login</a>
-  </p>
+        <a href="signup.html" class="btn-new">Get Started</a>
+        <p class="login-text">Already have an account? <a href="login.html">Login</a></p>
       </div>
-      <!-- <ul>
-        <li>Structured briefs capture goals, tone, audience, and assets.</li>
-        <li>Dashboard shows active and queued projects.</li>
-        <li>Review and approve delivered content.</li>
-        <li>Invite teammates and manage roles.</li>
-      </ul> -->
     </div>
   </section>
 
+  <!-- 🔹 Features Section -->
+  <section id="features" class="features-section">
+    <div class="container">
+      <h2>Why Choose H'ARTs Studio</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>🎯 Structured Briefs</h3>
+          <p>Define your goals, tone, and audience easily with our guided content brief system.</p>
+        </div>
+        <div class="feature-card">
+          <h3>⚡ Fast Turnaround</h3>
+          <p>Receive polished and ready-to-publish content in days, not weeks.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🤝 Collaborative Dashboard</h3>
+          <p>Track your projects, approve drafts, and chat with creatives all in one place.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🔹 CTA Section -->
+  <section id="plans" class="cta-section">
+    <div class="container center">
+      <h2>Choose Your Content Plan</h2>
+      <p>Flexible plans designed for startups, brands, and agencies.</p>
+      <a href="signup.html" class="btn-new">Explore Plans</a>
+    </div>
+  </section>
+
+  <!-- 🔹 Footer -->
   <footer class="footer center">
-    © <span id="year"></span> Content Ads — All rights reserved.
+    © <span id="year"></span> H'ARTs Studio — Empowering Creators.
   </footer>
 
+  <!-- ✅ Dynamic Year -->
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 
+  <!-- ✅ Particle Background Animation -->
   <script>
-  // Create animated glowing particles dynamically
-  const particlesContainer = document.querySelector('.particles');
-  const numParticles = 20;
+    const particlesContainer = document.querySelector('.particles');
+    const numParticles = 20;
 
-  for (let i = 0; i < numParticles; i++) {
-    const p = document.createElement('span');
-    p.classList.add('particle');
-    const size = Math.random() * 6 + 4; // between 4–10px
-    const left = Math.random() * 100;
-    const duration = Math.random() * 10 + 10; // 10–20s
-    const delay = Math.random() * 10;
-
-    p.style.width = `${size}px`;
-    p.style.height = `${size}px`;
-    p.style.left = `${left}%`;
-    p.style.animationDuration = `${duration}s`;
-    p.style.animationDelay = `${delay}s`;
-
-    particlesContainer.appendChild(p);
-  }
-</script>
-
+    for (let i = 0; i < numParticles; i++) {
+      const p = document.createElement('span');
+      p.classList.add('particle');
+      const size = Math.random() * 6 + 4;
+      const left = Math.random() * 100;
+      const duration = Math.random() * 10 + 10;
+      const delay = Math.random() * 10;
+      p.style.width = `${size}px`;
+      p.style.height = `${size}px`;
+      p.style.left = `${left}%`;
+      p.style.animationDuration = `${duration}s`;
+      p.style.animationDelay = `${delay}s`;
+      particlesContainer.appendChild(p);
+    }
+  </script>
 </body>
 </html>
