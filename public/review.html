@@ -5,13 +5,202 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Review — Content Ads</title>
   <link rel="stylesheet" href="css/styles.css">
+
+  <style>
+    /* --- Background blobs --- */
+    .review-blobs {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .review-blobs .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.12;
+      mix-blend-mode: screen;
+      animation: float 20s ease-in-out infinite;
+    }
+    .review-blobs .b1 {
+      width: 480px; height: 480px;
+      top: -10%; left: -10%;
+      background: radial-gradient(circle at 30% 30%, #60a5fa, transparent);
+      animation-delay: 0s;
+    }
+    .review-blobs .b2 {
+      width: 380px; height: 380px;
+      bottom: -10%; right: 5%;
+      background: radial-gradient(circle at 40% 40%, #f472b6, transparent);
+      animation-delay: 3s;
+    }
+    .review-blobs .b3 {
+      width: 420px; height: 420px;
+      top: 25%; right: 20%;
+      background: radial-gradient(circle at 50% 50%, #a78bfa, transparent);
+      animation-delay: 6s;
+    }
+
+    @keyframes float {
+      0% { transform: translate3d(0,0,0) scale(1); }
+      50% { transform: translate3d(30px, -20px, 0) scale(1.05); }
+      100% { transform: translate3d(0,0,0) scale(1); }
+    }
+
+    /* --- Header + layout tweaks --- */
+    header {
+      position: relative;
+      z-index: 2;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    header nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+    }
+
+    header .logo span {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    header a {
+      color: #fff;
+      margin-right: 1rem;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    header a:hover {
+      opacity: 0.8;
+    }
+
+    main {
+      position: relative;
+      z-index: 2;
+      padding-bottom: 3rem;
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Cards --- */
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+
+    h1, h2 {
+      color: #fff;
+      margin-bottom: 0.75rem;
+    }
+
+    .text-muted {
+      color: #9ca3af;
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      border-radius: 10px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: scale(1.03);
+    }
+
+    .btn.secondary {
+      background: #60a5fa;
+      color: #fff;
+      border: none;
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    textarea {
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 0.8rem;
+      width: 100%;
+      resize: vertical;
+    }
+
+    input[type="file"] {
+      background: rgba(255,255,255,0.05);
+      padding: 0.5rem;
+      border-radius: 8px;
+      color: #fff;
+      width: 100%;
+    }
+
+    #files {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+
+    #files div {
+      background: rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 0.8rem;
+      color: #fff;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    #files div:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* small screen */
+    @media (max-width: 768px) {
+      header nav { flex-direction: column; gap: 1rem; }
+    }
+  </style>
 </head>
+
 <body data-page="brand-review">
+  <!-- background blobs -->
+  <div class="review-blobs" aria-hidden="true">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+  </div>
+
   <a class="skip-link" href="#main">Skip to content</a>
+
   <header>
     <nav class="container">
-      <div class="logo"><img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" /><span>Content Ads</span></div>
-      <div>
+      <div class="logo">
+        <img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" />
+        <span>Content Ads</span>
+      </div>
+      <div class="nav-links">
         <a href="dashboard.html">Dashboard</a>
         <a href="projects.html">Projects</a>
         <a href="team.html">Team</a>

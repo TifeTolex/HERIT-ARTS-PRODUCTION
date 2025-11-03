@@ -521,7 +521,7 @@ input:focus, select:focus {
 
 /* Text utilities */
 .mt-1 { margin-top: 0.75rem; }
-.mt-2 { margin-top: 1.5rem; }
+.mt-2 { margin-top: .5rem; }
 
 .kpi {
   margin-top: 1rem;
