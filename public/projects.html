@@ -4,69 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Projects — Content Ads</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <style>
-    /* --- Responsive nav upgrade with animation --- */
-    .nav-links {
-      display: flex;
-      gap: 1rem;
-    }
-
-    .menu-toggle {
-      display: none;
-      font-size: 1.5rem;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text-color, #000);
-    }
-
-    @media (max-width: 768px) {
-      .nav-links {
-        display: none;
-        flex-direction: column;
-        position: absolute;
-        top: 60px;
-        right: 1rem;
-        background: var(--bg-color, #1e1e1e); /* dark mode background */
-        padding: 1rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        z-index: 1000;
-
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: all 0.3s ease;
-      }
-
-      .nav-links a,
-      .nav-links button {
-        color: var(--text-color, #fff); /* text visible in dark mode */
-      }
-
-      .nav-links.active {
-        display: flex;
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      .menu-toggle {
-        display: block;
-        color: var(--text-color, #fff);
-      }
-
-      .btn.ghost {
-        color: var(--text-color, #fff);
-        border: 1px solid var(--text-color, #fff);
-      }
-    }
-
-    /* Dark mode root variables (optional) */
-    body[data-theme="dark"] {
-      --bg-color: #1e1e1e;
-      --text-color: #ffffff;
-    }
-  </style>
+  <link rel="stylesheet" href="css/projects.css">
+ 
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -77,14 +16,15 @@
         <span>Content Ads</span>
       </div>
 
-        <!-- Hamburger button -->
+    
+                <!-- Hamburger button -->
     <div class="menu-toggle" id="menuToggle">
       <span></span>
       <span></span>
       <span></span>
     </div>
 
-      <div class="nav-links" id="navLinks">
+        <div class="nav-links" id="navLinks">
          <a href="dashboard.html">Dashboard</a>
         <a href="projects.html" aria-current="page">Projects</a>
         <a href="team.html">Team</a>
@@ -99,7 +39,115 @@
   </header>
   <main id="main" class="container">
     <h1>Create New Project</h1>
+
     <form id="projectForm" class="card">
+      <div class="form-row">
+        <label for="name">Project name</label>
+        <input id="name" required placeholder="e.g. August Instagram campaign" />
+      </div>
+
+      <div class="form-row">
+        <label for="contentType">Content type</label>
+        <select id="contentType">
+          <option>Film & Video Advertising</option>
+          <option>Digital & Social Media Content</option>
+          <option>Stage & Live Band Activations</option>
+          <option>Creative Development & Strategy</option>
+          <option>Corporate & Event Media</option>
+          <option>Specialised Content Production</option>
+          <option>Small Business (SME) Packages</option>
+          <option>Others</option>
+        </select>
+      </div>
+
+      <div class="form-row inline">
+        <div>
+          <label for="deadline">Deadline</label>
+          <input id="deadline" type="date" />
+        </div>
+        <div>
+          <label for="goal">Primary goal</label>
+          <input id="goal" placeholder="e.g. Brand awareness" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label for="features">Key product features</label>
+        <textarea id="features" rows="3" placeholder="Bullet points..."></textarea>
+      </div>
+
+      <fieldset class="mt-2">
+        <legend>Target audience</legend>
+        <div class="form-row inline">
+          <div>
+            <label for="audienceSelect">Select existing (multi-select)</label>
+            <select id="audienceSelect" multiple size="4"></select>
+          </div>
+          <div class="mt-1">
+            <button class="btn ghost" type="button" id="addAudienceBtn">+ Add New Target Audience</button>
+            <div id="newAudience" class="mt-1" hidden>
+              <input id="audName" placeholder="Audience name" />
+              <input id="audDesc" placeholder="Short description" />
+              <button class="btn" type="button" id="saveAudienceBtn">Save</button>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="mt-2">
+        <legend>Tone of voice</legend>
+        <div class="form-row">
+          <select id="tonesSelect" multiple size="4">
+            <option>Playful</option>
+            <option>Professional</option>
+            <option>Bold</option>
+            <option>Friendly</option>
+            <option>Luxurious</option>
+            <option>Minimal</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <fieldset class="mt-2">
+        <legend>Assets</legend>
+        <div class="form-row inline">
+          <div>
+            <label for="brandLogo">Brand logo</label>
+            <input id="brandLogo" type="file" accept="image/*" />
+          </div>
+          <div>
+            <label for="brandColors">Brand color codes (comma-separated)</label>
+            <input id="brandColors" placeholder="#0F62FE, #161616" />
+          </div>
+        </div>
+        <div class="form-row">
+          <label for="prodAssets">Product images / videos</label>
+          <input id="prodAssets" type="file" multiple accept="image/*,video/*" />
+        </div>
+        <div class="form-row">
+          <label for="typography">Typography guidelines (optional)</label>
+          <input id="typography" type="text" placeholder="e.g., Inter, 16/24" />
+        </div>
+      </fieldset>
+
+      <fieldset class="mt-2">
+        <legend>Where will content be used?</legend>
+        <div class="grid cols-3">
+          <label><input type="checkbox" name="usage" value="Instagram" /> Instagram</label>
+          <label><input type="checkbox" name="usage" value="Tiktok" /> Tiktok</label>
+          <label><input type="checkbox" name="usage" value="X" /> X</label>
+          <label><input type="checkbox" name="usage" value="LinkedIn" /> LinkedIn</label>
+          <label><input type="checkbox" name="usage" value="Email campaign" /> Email campaign</label>
+        </div>
+      </fieldset>
+
+      <div class="form-row">
+        <label for="notes">Additional notes</label>
+        <textarea id="notes" rows="3"></textarea>
+      </div>
+      <button class="btn" type="submit">Submit brief</button>
+    </form>
+
       <!-- form content stays the same -->
       ...
       <button class="btn" type="submit">Submit brief</button>
@@ -116,15 +164,23 @@
     window.logout = logout;
   </script>
 
-  <script>
-    // Toggle mobile menu with smooth animation
-    const menuToggle = document.querySelector('.menu-toggle');
-    const navLinks = document.querySelector('.nav-links');
+    <script>
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinks = document.getElementById('navLinks');
 
-    menuToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('active');
-    });
-  </script>
+  menuToggle.addEventListener('click', () => {
+    menuToggle.classList.toggle('active');
+    navLinks.classList.toggle('active');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+      menuToggle.classList.remove('active');
+      navLinks.classList.remove('active');
+    }
+  });
+</script>
 </body>
 </html>
 

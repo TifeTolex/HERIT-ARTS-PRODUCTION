@@ -1,0 +1,213 @@
+/* === PROJECTS PAGE STYLING === */
+
+body {
+  background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  color: #1a1a1a;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Blobs / background visuals */
+body::before, 
+body::after {
+  content: "";
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  filter: blur(100px);
+  z-index: 0;
+  opacity: 0.5;
+}
+body::before {
+  background: #8fd3f4;
+  top: -100px;
+  left: -150px;
+}
+body::after {
+  background: #84fab0;
+  bottom: -100px;
+  right: -150px;
+}
+
+/* Header & Nav */
+header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+nav.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #222;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.nav-links a:hover, 
+.nav-links a[aria-current="page"] {
+  color: #2563eb;
+}
+
+.btn.ghost {
+  background: transparent;
+  border: 1px solid #2563eb;
+  color: #2563eb;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn.ghost:hover {
+  background: #2563eb;
+  color: white;
+}
+
+/* Hamburger toggle */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+.menu-toggle span {
+  width: 25px;
+  height: 3px;
+  background: #333;
+  transition: 0.3s;
+}
+.menu-toggle.active span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+.menu-toggle.active span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: flex;
+  }
+  .nav-links {
+    position: absolute;
+    top: 70px;
+    right: 0;
+    flex-direction: column;
+    background: white;
+    width: 60%;
+    padding: 1rem;
+    border-radius: 12px 0 0 12px;
+    box-shadow: -2px 4px 12px rgba(0,0,0,0.1);
+    transform: translateX(110%);
+    opacity: 0;
+  }
+  .nav-links.active {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* === Main Form Styling === */
+main.container {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+}
+
+main h1 {
+  font-size: 1.6rem;
+  margin-bottom: 1.2rem;
+  color: #111;
+  text-align: center;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-row.inline {
+  display: flex;
+  gap: 1rem;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  transition: 0.2s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+}
+
+legend {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.4rem;
+}
+
+.grid.cols-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.5rem;
+}
+
+.btn {
+  background: #2563eb;
+  color: white;
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.btn:hover {
+  background: #1d4ed8;
+}

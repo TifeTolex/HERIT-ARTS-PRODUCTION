@@ -192,7 +192,7 @@
     <div class="blob b3"></div>
   </div>
 
-  <a class="skip-link" href="#main">Skip to content</a>
+  <!-- <a class="skip-link" href="#main">Skip to content</a> -->
 
   <header>
     <nav class="container">
@@ -200,6 +200,14 @@
         <img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" />
         <span>Content Ads</span>
       </div>
+     
+            <!-- Hamburger button -->
+    <div class="menu-toggle" id="menuToggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
       <div class="nav-links">
         <a href="dashboard.html">Dashboard</a>
         <a href="projects.html">Projects</a>
@@ -207,6 +215,7 @@
         <button class="btn ghost" id="logoutBtn">Logout</button>
       </div>
     </nav>
+
   </header>
 
   <main id="main" class="container">
@@ -242,6 +251,25 @@
     requireAuthOrRedirect();
     document.getElementById("logoutBtn")?.addEventListener("click", logout);
   </script>
+
+    <script>
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinks = document.getElementById('navLinks');
+
+  menuToggle.addEventListener('click', () => {
+    menuToggle.classList.toggle('active');
+    navLinks.classList.toggle('active');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+      menuToggle.classList.remove('active');
+      navLinks.classList.remove('active');
+    }
+  });
+</script>
+
   <script type="module" src="js/review.js"></script>
 </body>
 </html>
