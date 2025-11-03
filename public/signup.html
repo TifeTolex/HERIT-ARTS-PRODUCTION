@@ -5,9 +5,152 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Signup — Content Ads</title>
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top left, #0b0b0b, #151515);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: transparent;
+      position: absolute;
+      top: 0;
+      width: 100%;
+      z-index: 10;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6rem 1rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* floating background circles */
+    .bg-shape {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.25;
+      animation: float 12s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+
+    .bg-shape.s1 {
+      width: 280px; height: 280px;
+      background: #0ff;
+      top: 10%; left: 15%;
+      animation-delay: 0s;
+    }
+    .bg-shape.s2 {
+      width: 360px; height: 360px;
+      background: #f0f;
+      bottom: 10%; right: 15%;
+      animation-delay: 3s;
+    }
+
+    @keyframes float {
+      from { transform: translateY(0) rotate(0deg); }
+      to { transform: translateY(-30px) rotate(20deg); }
+    }
+
+    /* frosted card */
+    .card {
+      position: relative;
+      z-index: 2;
+      max-width: 520px;
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 0 30px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeInUp 0.9s ease both;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 40px rgba(0,0,0,0.45);
+    }
+
+   main h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+        font-size: clamp(20px, 3vw, 32px);
+      letter-spacing: 0.5px;
+      color: o
+    }
+    
+    .form-row label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+      opacity: 0.9;
+    }
+
+    .form-row input,
+    .form-row select {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-row input:focus,
+    .form-row select:focus {
+      border-color: #6a5acd;
+    }
+
+    .btn {
+      width: 100%;
+      margin-top: 1rem;
+      background: linear-gradient(90deg, #c084fc, #a855f7, #7c3aed);
+      border: none;
+      border-radius: 10px;
+      padding: 0.9rem;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(0, 200, 255, 0.4);
+    }
+
+    p.text-muted {
+      text-align: center;
+      margin-top: 0.8rem;
+      opacity: 0.7;
+      font-size: 0.85rem;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
 </head>
-<body>
-  <!-- <a class="skip-link" href="#main">Skip to content</a> -->
+<body data-page="signup">
   <header>
     <nav class="container">
       <div class="logo">
@@ -15,12 +158,11 @@
         <span>Content Ads</span>
       </div>
 
-        <!-- Hamburger button -->
-    <div class="menu-toggle" id="menuToggle">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
+      <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
 
       <div class="nav-links" id="navLinks">
         <a href="index.html">Home</a>
@@ -29,9 +171,13 @@
     </nav>
   </header>
 
-  <main id="main" class="container">
-    <h1>Create your brand account</h1>
+  <main id="main">
+    <div class="bg-shape s1"></div>
+    <div class="bg-shape s2"></div>
+
     <form id="signupForm" class="card">
+      <h1>Create your brand account</h1>
+
       <div class="form-row inline">
         <div>
           <label for="firstName">First name</label>
@@ -42,16 +188,19 @@
           <input id="lastName" name="lastName" required />
         </div>
       </div>
+
       <div class="form-row">
         <label for="email">Email</label>
         <input id="email" name="email" type="email" required />
       </div>
+
       <div class="form-row">
         <label for="password">Password</label>
         <input id="password" name="password" type="password" required />
       </div>
 
-      <h2 class="mt-2">Business onboarding</h2>
+      <h2 class="mt-2" style="margin-top:1.5rem;">Business onboarding</h2>
+
       <div class="form-row inline">
         <div>
           <label for="logo">Business logo (optional)</label>
@@ -62,6 +211,7 @@
           <input id="businessName" name="businessName" required />
         </div>
       </div>
+
       <div class="form-row">
         <label for="industry">Industry</label>
         <select id="industry" name="industry" required>
@@ -74,16 +224,7 @@
           <option>Other</option>
         </select>
       </div>
-      <!-- <div class="form-row inline">
-        <div>
-          <label for="brandColor">Brand color (hex)</label>
-          <input id="brandColor" name="brandColor" type="text" placeholder="#0F62FE" />
-        </div>
-        <div>
-          <label for="typography">Typography guidelines (optional)</label>
-          <input id="typography" name="typography" type="text" placeholder="e.g., Inter, 16/24" />
-        </div>
-      </div> -->
+
       <div class="form-row">
         <label for="planIntent">Start with a subscription?</label>
         <select id="planIntent" name="planIntent">
@@ -91,30 +232,28 @@
           <option value="now">Choose a plan now</option>
         </select>
       </div>
+
       <button class="btn" type="submit">Create account</button>
-      <p class="text-muted mt-1">If no logo is uploaded, your initials will be used as a fallback.</p>
+      <p class="text-muted">If no logo is uploaded, your initials will be used as a fallback.</p>
     </form>
   </main>
 
   <script type="module" src="js/auth.js"></script>
-
   <script>
-  const menuToggle = document.getElementById('menuToggle');
-  const navLinks = document.getElementById('navLinks');
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
 
-  menuToggle.addEventListener('click', () => {
-    menuToggle.classList.toggle('active');
-    navLinks.classList.toggle('active');
-  });
+    menuToggle.addEventListener('click', () => {
+      menuToggle.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    });
 
-  // Close menu when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
-      menuToggle.classList.remove('active');
-      navLinks.classList.remove('active');
-    }
-  });
-</script>
-
+    document.addEventListener('click', (e) => {
+      if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+        menuToggle.classList.remove('active');
+        navLinks.classList.remove('active');
+      }
+    });
+  </script>
 </body>
 </html>
