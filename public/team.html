@@ -52,7 +52,7 @@
   </style>
 </head>
 <body data-page="brand-team">
-  <a class="skip-link" href="#main">Skip to content</a>
+  <!-- <a class="skip-link" href="#main">Skip to content</a> -->
   <header>
     <nav class="container">
       <div class="logo">
@@ -60,17 +60,21 @@
         <span>Content Ads</span>
       </div>
 
-      <!-- Mobile menu toggle -->
-      <button class="menu-toggle" aria-label="Toggle menu">☰</button>
+                <!-- Hamburger button -->
+    <div class="menu-toggle" id="menuToggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
 
-      <!-- Navigation links -->
-      <div class="nav-links">
+        <div class="nav-links">
         <a href="dashboard.html">Dashboard</a>
         <a href="projects.html">Projects</a>
         <a href="team.html" aria-current="page">Team</a>
         <button class="btn ghost" id="logoutBtn">Logout</button>
       </div>
     </nav>
+
   </header>
   <main id="main" class="container">
     <h1>Invite team members</h1>
@@ -174,14 +178,22 @@
     loadMembers();
   </script>
 
-  <script>
-    // Toggle mobile menu with smooth animation
-    const menuToggle = document.querySelector('.menu-toggle');
-    const navLinks = document.querySelector('.nav-links');
+     <script>
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinks = document.getElementById('navLinks');
 
-    menuToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('active');
-    });
-  </script>
+  menuToggle.addEventListener('click', () => {
+    menuToggle.classList.toggle('active');
+    navLinks.classList.toggle('active');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+      menuToggle.classList.remove('active');
+      navLinks.classList.remove('active');
+    }
+  });
+</script>
 </body>
 </html>
