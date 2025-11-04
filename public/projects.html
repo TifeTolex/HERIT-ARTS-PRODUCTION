@@ -8,6 +8,11 @@
   <!-- FontAwesome for platform icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-6G0N6CrY1z6XfXj7A3l7+Il8TT4s6mv6bWvcnX0q5lgnx1YjsJHdKrkxD8M8bLRnRGrdzvRrKpl1R5H0f3Y8Rw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="css/projects.css">
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+/>
+
 </head>
 <body>
   <header>
@@ -124,16 +129,36 @@
         </div>
       </fieldset>
 
-      <fieldset>
-        <legend>Where will content be used?</legend>
-        <div class="platform-grid">
-          <label><input type="checkbox" value="Instagram"><i class="fa-brands fa-instagram"></i> Instagram</label>
-          <label><input type="checkbox" value="Tiktok"><i class="fa-brands fa-tiktok"></i> Tiktok</label>
-          <label><input type="checkbox" value="X"><i class="fa-brands fa-x-twitter"></i> X (Twitter)</label>
-          <label><input type="checkbox" value="LinkedIn"><i class="fa-brands fa-linkedin"></i> LinkedIn</label>
-          <label><input type="checkbox" value="Email"><i class="fa-solid fa-envelope"></i> Email Campaign</label>
-        </div>
-      </fieldset>
+   <fieldset>
+  <legend>Where will content be used?</legend>
+  <div class="platform-grid">
+    <label title="Instagram">
+      <input type="checkbox" value="Instagram" />
+      <i class="fa-brands fa-instagram"></i>
+    </label>
+
+    <label title="TikTok">
+      <input type="checkbox" value="TikTok" />
+      <i class="fa-brands fa-tiktok"></i>
+    </label>
+
+    <label title="X (Twitter)">
+      <input type="checkbox" value="X" />
+      <i class="fa-brands fa-x-twitter"></i>
+    </label>
+
+    <label title="LinkedIn">
+      <input type="checkbox" value="LinkedIn" />
+      <i class="fa-brands fa-linkedin"></i>
+    </label>
+
+    <label title="Email">
+      <input type="checkbox" value="Email" />
+      <i class="fa-solid fa-envelope"></i>
+    </label>
+  </div>
+</fieldset>
+
 
       <div class="form-row">
         <label for="notes">Additional notes</label>
