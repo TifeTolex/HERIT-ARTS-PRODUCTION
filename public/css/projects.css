@@ -1,15 +1,21 @@
-/* === PROJECTS PAGE STYLING (Dark Mode + Floating Blobs) === */
+/* === PROJECT PAGE — Premium Dark Theme === */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 body {
   background: radial-gradient(circle at top left, #0f172a, #020617);
-  min-height: 100vh;
-  font-family: 'Inter', sans-serif;
   color: #f8fafc;
+  font-family: "Inter", sans-serif;
+  min-height: 100vh;
   overflow-x: hidden;
   position: relative;
 }
 
-/* === Floating Blobs === */
+/* === Floating Glow Blobs === */
 body::before,
 body::after {
   content: "";
@@ -18,41 +24,47 @@ body::after {
   height: 420px;
   border-radius: 50%;
   filter: blur(130px);
-  opacity: 0.65;
+  opacity: 0.7;
   z-index: 0;
   mix-blend-mode: screen;
   animation: floatBlob 10s ease-in-out infinite alternate,
-             hueShift 20s linear infinite;
+             hueShift 25s linear infinite;
 }
+
 body::before {
   background: radial-gradient(circle, rgba(59,130,246,0.8), rgba(147,51,234,0.6));
   top: -120px;
   left: -180px;
   animation-delay: 0s, 5s;
 }
+
 body::after {
-  background: radial-gradient(circle, rgba(236,72,153,0.7), rgba(37,99,235,0.6));
-  bottom: -120px;
+  background: radial-gradient(circle, rgba(236,72,153,0.75), rgba(37,99,235,0.5));
+  bottom: -150px;
   right: -180px;
   animation-delay: 2s, 10s;
 }
+
 @keyframes floatBlob {
   0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(30px, -40px) scale(1.1); }
+  100% { transform: translate(40px, -30px) scale(1.1); }
 }
 @keyframes hueShift {
   0% { filter: blur(130px) hue-rotate(0deg); }
   100% { filter: blur(130px) hue-rotate(360deg); }
 }
 
-/* === Header & Nav === */
+/* === HEADER & NAV === */
 header {
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  position: sticky;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: fixed;
   top: 0;
-  z-index: 10;
+  left: 0;
+  width: 100%;
+  z-index: 20;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
 }
 
 nav.container {
@@ -60,6 +72,8 @@ nav.container {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
+  max-width: 1200px;
+  margin: auto;
 }
 
 .logo {
@@ -67,27 +81,28 @@ nav.container {
   align-items: center;
   gap: 0.6rem;
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   color: #fff;
 }
 
 .logo img {
-  filter: brightness(1.1);
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
+  filter: brightness(1.1);
 }
 
 .nav-links {
   display: flex;
   align-items: center;
   gap: 1.2rem;
-  transition: all 0.3s ease;
 }
 
 .nav-links a {
   text-decoration: none;
   color: #cbd5e1;
   font-weight: 500;
-  transition: 0.3s;
+  transition: color 0.3s ease;
 }
 
 .nav-links a:hover,
@@ -100,28 +115,31 @@ nav.container {
   border: 1px solid #60a5fa;
   color: #60a5fa;
   padding: 0.45rem 0.9rem;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: 0.3s;
 }
 .btn.ghost:hover {
   background: #60a5fa;
-  color: white;
+  color: #fff;
 }
 
-/* === Hamburger Menu === */
+/* === Mobile Nav Toggle === */
 .menu-toggle {
   display: none;
   flex-direction: column;
   gap: 5px;
   cursor: pointer;
 }
+
 .menu-toggle span {
   width: 25px;
   height: 3px;
   background: #fff;
+  border-radius: 2px;
   transition: 0.3s;
 }
+
 .menu-toggle.active span:nth-child(1) {
   transform: translateY(8px) rotate(45deg);
 }
@@ -144,8 +162,8 @@ nav.container {
     background: rgba(15, 23, 42, 0.95);
     width: 65%;
     padding: 1.2rem;
-    border-radius: 12px 0 0 12px;
-    box-shadow: -2px 4px 12px rgba(0,0,0,0.5);
+    border-radius: 16px 0 0 16px;
+    box-shadow: -4px 6px 16px rgba(0,0,0,0.4);
     transform: translateX(110%);
     opacity: 0;
     transition: all 0.35s ease;
@@ -156,29 +174,31 @@ nav.container {
   }
 }
 
-/* === Main Form Card === */
+/* === MAIN CONTENT === */
 main.container {
   position: relative;
   z-index: 1;
   max-width: 850px;
-  margin: 3rem auto;
-  padding: 2rem 2.5rem;
-  background: rgba(255, 255, 255, 0.06);
+  margin: 7rem auto 3rem;
+  padding: 2.2rem 2.6rem;
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(15px);
-  border-radius: 20px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(18px);
+  border-radius: 22px;
+  box-shadow: 0 10px 45px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
 }
 
 main h1 {
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 1.9rem;
   text-align: center;
-  margin-bottom: 2rem;
+  font-weight: 700;
   color: #f9fafb;
+  margin-bottom: 2rem;
+  letter-spacing: 0.5px;
 }
 
-/* === Form Styling === */
+/* === FORM STYLING === */
 .card {
   display: flex;
   flex-direction: column;
@@ -200,20 +220,21 @@ main h1 {
 
 .form-row.inline > div {
   flex: 1 1 250px;
-  min-width: 180px;
+  min-width: 200px;
 }
 
-/* === Input & Textareas === */
-input, select, textarea {
+/* === INPUTS & SELECTS === */
+input,
+select,
+textarea {
   width: 100%;
   padding: 0.8rem 1rem;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.06);
   color: #f8fafc;
   outline: none;
   transition: 0.3s;
-  box-sizing: border-box;
 }
 
 input::placeholder,
@@ -225,27 +246,26 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: #60a5fa;
-  box-shadow: 0 0 0 2px rgba(96,165,250,0.25);
+  box-shadow: 0 0 10px rgba(96,165,250,0.35);
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* === Fieldsets === */
+/* === FIELDSETS === */
 fieldset {
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  padding: 1.2rem 1rem 1.3rem;
-  margin-top: 1rem;
+  border-radius: 16px;
+  padding: 1.3rem 1.1rem;
+  margin-top: 1.2rem;
 }
 
 legend {
   font-weight: 600;
   color: #e2e8f0;
   font-size: 0.95rem;
-  padding: 0 0.4rem;
-  margin-bottom: 0.4rem;
+  padding: 0 0.5rem;
 }
 
-/* === Checkbox Grid === */
+/* === CHECKBOX GRID === */
 .grid.cols-3 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -257,53 +277,51 @@ legend {
   align-items: center;
   gap: 0.5rem;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  padding: 0.5rem 0.7rem;
+  border-radius: 12px;
+  padding: 0.55rem 0.8rem;
   cursor: pointer;
-  transition: background 0.25s ease;
+  transition: background 0.25s ease, transform 0.2s ease;
 }
 .grid label:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
 }
 
 .grid input[type="checkbox"] {
   accent-color: #60a5fa;
 }
 
-/* === Buttons === */
+/* === BUTTONS === */
 .btn {
   background: linear-gradient(90deg, #3b82f6, #9333ea);
-  color: white;
-  padding: 0.8rem 1.3rem;
+  color: #fff;
+  padding: 0.9rem 1.4rem;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
 }
-
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59,130,246,0.4);
+  box-shadow: 0 8px 22px rgba(59,130,246,0.45);
 }
 
-/* === Mobile Responsiveness === */
+/* === MOBILE === */
 @media (max-width: 600px) {
   main.container {
-    margin: 2rem 1rem;
-    padding: 1.6rem 1.4rem;
+    margin: 6rem 1rem 2rem;
+    padding: 1.6rem 1.3rem;
   }
-
   .form-row.inline {
     flex-direction: column;
   }
-
   .form-row.inline > div {
     min-width: 100%;
   }
-
-  h1 {
-    font-size: 1.5rem;
+  main h1 {
+    font-size: 1.55rem;
   }
 }
