@@ -4,212 +4,267 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Review — Content Ads</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <!-- <link rel="stylesheet" href="css/styles.css" /> -->
+  <style>
+    /* === GLOBAL THEME === */
+    html{
+      scroll-behavior: smooth;
+    }
+    body {
+      background: radial-gradient(circle at top left, #0f172a, #020617);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
 
- <style>
-  /* === Page background === */
-  body {
-    background: radial-gradient(circle at top left, #0f172a, #020617);
-    color: #fff;
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+    /* === FLOATING BLOBS === */
+    .review-blobs {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
 
-  /* === Floating Blobs with hue animation === */
-  .review-blobs {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(140px);
+      opacity: 0.55;
+      mix-blend-mode: screen;
+      animation: float 14s ease-in-out infinite alternate, hueShift 18s linear infinite;
+    }
 
-  .review-blobs .blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(140px);
-    opacity: 0.55;
-    mix-blend-mode: screen;
-    animation: float 14s ease-in-out infinite alternate, hueShift 18s linear infinite;
-  }
+    .b1 { width: 480px; height: 480px; top: -10%; left: -10%;
+      background: radial-gradient(circle at 30% 30%, #60a5fa, #3b82f6);
+      animation-delay: 0s, 4s; }
+    .b2 { width: 420px; height: 420px; bottom: -15%; right: -10%;
+      background: radial-gradient(circle at 50% 50%, #ec4899, #a855f7);
+      animation-delay: 2s, 8s; }
+    .b3 { width: 500px; height: 500px; top: 40%; right: 20%;
+      background: radial-gradient(circle at 50% 50%, #22d3ee, #6366f1);
+      animation-delay: 5s, 10s; }
 
-  .b1 {
-    width: 480px; height: 480px;
-    top: -10%; left: -10%;
-    background: radial-gradient(circle at 30% 30%, #60a5fa, #3b82f6);
-    animation-delay: 0s, 4s;
-  }
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(30px, -40px) scale(1.1); }
+    }
 
-  .b2 {
-    width: 420px; height: 420px;
-    bottom: -15%; right: -10%;
-    background: radial-gradient(circle at 50% 50%, #ec4899, #a855f7);
-    animation-delay: 2s, 8s;
-  }
+    @keyframes hueShift {
+      0% { filter: blur(140px) hue-rotate(0deg); }
+      100% { filter: blur(140px) hue-rotate(360deg); }
+    }
 
-  .b3 {
-    width: 500px; height: 500px;
-    top: 40%; right: 20%;
-    background: radial-gradient(circle at 50% 50%, #22d3ee, #6366f1);
-    animation-delay: 5s, 10s;
-  }
+    /* === HEADER === */
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-  @keyframes float {
-    0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(30px, -40px) scale(1.1); }
-  }
+    nav.container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      max-width: 100%;
+      margin: 0 auto;
+    }
 
-  @keyframes hueShift {
-    0% { filter: blur(140px) hue-rotate(0deg); }
-    100% { filter: blur(140px) hue-rotate(360deg); }
-  }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
 
-  /* === Header === */
-  header {
-    position: relative;
-    z-index: 2;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.3s ease;
+    }
 
-  header nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 0;
-  }
+    .nav-links a {
+      color: #fff;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
 
-  .logo span {
-    font-weight: 600;
-    margin-left: 6px;
-    letter-spacing: 0.5px;
-  }
+    .nav-links a:hover {
+      color: #60a5fa;
+    }
 
-  .nav-links a {
-    color: #fff;
-    margin-right: 1rem;
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
+    .btn.ghost {
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      padding: 0.6rem 1.2rem;
+      transition: all 0.3s ease;
+    }
 
-  .nav-links a:hover {
-    color: #60a5fa;
-  }
+    .btn.ghost:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(1.04);
+    }
 
-  /* === Main Content === */
-  main {
-    position: relative;
-    z-index: 2;
-    animation: fadeIn 1s ease;
-  }
+    /* === HAMBURGER === */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+    }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+    .menu-toggle span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+      transition: 0.3s;
+    }
 
-  /* === Cards === */
-  .card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.25);
-    transition: all 0.3s ease;
-  }
+    .menu-toggle.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .menu-toggle.active span:nth-child(2) { opacity: 0; }
+    .menu-toggle.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 32px rgba(0,0,0,0.35);
-  }
+    @media (max-width: 768px) {
+      .menu-toggle { display: flex; }
+      .nav-links {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        flex-direction: column;
+        background: rgba(0, 0, 0, 0.85);
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 1rem;
+        transform: translateY(-200%);
+        opacity: 0;
+      }
+      .nav-links.active {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
 
-  /* === Buttons === */
-  .btn {
-    border-radius: 10px;
-    padding: 0.6rem 1.4rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
+    /* === MAIN CONTENT === */
+    main {
+      position: relative;
+      z-index: 2;
+      padding: 7rem 1.5rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      animation: fadeIn 1s ease;
+    }
 
-  .btn:hover {
-    transform: scale(1.04);
-  }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-  .btn.secondary {
-    background: linear-gradient(90deg, #3b82f6, #a855f7);
-    color: #fff;
-    border: none;
-    box-shadow: 0 0 10px rgba(59,130,246,0.3);
-  }
+    /* === CARDS === */
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+      transition: all 0.3s ease;
+    }
 
-  .btn.secondary:hover {
-    box-shadow: 0 0 18px rgba(168,85,247,0.4);
-  }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+    }
 
-  .btn.ghost {
-    background: transparent;
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.3);
-  }
+    h1{
+      margin-top: 1rem;
+    }
 
-  /* === Text areas and file inputs === */
-  textarea, input[type="file"] {
-    background: rgba(255,255,255,0.05);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    padding: 0.8rem;
-    width: 100%;
-    font-family: inherit;
-    transition: border 0.3s ease;
-  }
+    /* === INPUTS === */
+    textarea, input[type="file"] {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.8rem;
+      width: 100%;
+      font-family: inherit;
+      transition: border 0.3s ease;
+    }
 
-  textarea:focus, input[type="file"]:focus {
-    outline: none;
-    border-color: #60a5fa;
-  }
+    textarea:focus, input[type="file"]:focus {
+      outline: none;
+      border-color: #60a5fa;
+    }
 
-  /* === File grid === */
-  #files {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-  }
+    /* === FILE GRID === */
+    #files {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
 
-  #files div {
-    background: rgba(255,255,255,0.08);
-    border-radius: 8px;
-    padding: 0.8rem;
-    color: #fff;
-    text-align: center;
-    transition: background 0.3s;
-  }
+    #files div {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 0.8rem;
+      text-align: center;
+      transition: background 0.3s;
+    }
+    
 
-  #files div:hover {
-    background: rgba(255,255,255,0.15);
-  }
+    #files div:hover { background: rgba(255, 255, 255, 0.15); }
 
-  /* === Mobile === */
-  @media (max-width: 768px) {
-    header nav { flex-direction: column; gap: 1rem; }
-  }
-</style>
+    /* === BUTTONS === */
+    .btn {
+      border-radius: 10px;
+      padding: 0.6rem 1.4rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
 
+    .btn.secondary {
+      background: linear-gradient(90deg, #3b82f6, #a855f7);
+      color: #fff;
+      border: none;
+      box-shadow: 0 0 10px rgba(59,130,246,0.3);
+    }
+
+    .btn.secondary:hover {
+      box-shadow: 0 0 18px rgba(168,85,247,0.4);
+      transform: scale(1.04);
+    }
+    input{
+      max-width: 90%;
+    }
+    .form-row { margin-top: 1rem; 
+              max-width: 90%;}
+    .form-row.inline { display: flex;
+       gap: 1rem; flex-wrap: wrap; }
+  </style>
 </head>
 
 <body data-page="brand-review">
-  <!-- background blobs -->
+  <!-- Background blobs -->
   <div class="review-blobs" aria-hidden="true">
     <div class="blob b1"></div>
     <div class="blob b2"></div>
     <div class="blob b3"></div>
   </div>
-
-  <!-- <a class="skip-link" href="#main">Skip to content</a> -->
 
   <header>
     <nav class="container">
@@ -217,46 +272,39 @@
         <img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" />
         <span>Content Ads</span>
       </div>
-     
-            <!-- Hamburger button -->
-    <div class="menu-toggle" id="menuToggle">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-
-      <div class="nav-links">
+      <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="nav-links" id="navLinks">
         <a href="dashboard.html">Dashboard</a>
         <a href="projects.html">Projects</a>
         <a href="team.html">Team</a>
         <button class="btn ghost" id="logoutBtn">Logout</button>
       </div>
     </nav>
-
   </header>
 
   <main id="main" class="container">
-    <h1>Project</h1>
-
-    <!-- Project details -->
+    <h1>Project Review</h1>
     <section id="details" class="card"></section>
 
-    <!-- File delivery + feedback -->
-    <section class="card mt-2">
-      <h2>Delivered files</h2>
-      <div class="text-muted">For demo: you can upload files to simulate a delivery.</div>
+    <section class="card">
+      <h2>Delivered Files</h2>
+      <p class="text-muted">For demo: upload files to simulate a delivery.</p>
 
       <input type="file" id="uploader" multiple />
       <button id="uploadBtn" class="btn">Upload (demo)</button>
 
-      <div id="files" class="grid mt-2"></div>
+      <div id="files"></div>
 
-      <div class="form-row mt-1">
+      <div class="form-row">
         <label for="reviewNotes">Notes to production</label>
         <textarea id="reviewNotes" rows="3" placeholder="Optional feedback..."></textarea>
       </div>
 
-      <div class="form-row inline mt-1">
+      <div class="form-row inline">
         <button id="approveBtn" class="btn secondary">Mark as approved</button>
         <button id="requestChangesBtn" class="btn ghost">Request changes</button>
       </div>
@@ -269,23 +317,20 @@
     document.getElementById("logoutBtn")?.addEventListener("click", logout);
   </script>
 
-    <script>
-  const menuToggle = document.getElementById('menuToggle');
-  const navLinks = document.getElementById('navLinks');
-
-  menuToggle.addEventListener('click', () => {
-    menuToggle.classList.toggle('active');
-    navLinks.classList.toggle('active');
-  });
-
-  // Close menu when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
-      menuToggle.classList.remove('active');
-      navLinks.classList.remove('active');
-    }
-  });
-</script>
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    menuToggle.addEventListener('click', () => {
+      menuToggle.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    });
+    document.addEventListener('click', (e) => {
+      if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+        menuToggle.classList.remove('active');
+        navLinks.classList.remove('active');
+      }
+    });
+  </script>
 
   <script type="module" src="js/review.js"></script>
 </body>

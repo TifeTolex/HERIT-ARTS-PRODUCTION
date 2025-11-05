@@ -4,72 +4,271 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Production Dashboard — Content Ads</title>
-  <link rel="stylesheet" href="css/styles.css">
-   <!-- <style>
-    /* --- Responsive nav upgrade with animation --- */
+
+
+  <style>
+    /* --- Dashboard background --- */
+    body {
+      background: radial-gradient(circle at top right, #1a1a2e, #0f0c29, #000);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    header {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav.container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .logo span {
+      color: #00c6ff;
+    }
+
     .nav-links {
       display: flex;
       gap: 1rem;
+      align-items: center;
     }
 
+    .nav-links a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a[aria-current="page"] {
+      color: #00c6ff;
+    }
+
+    .btn.ghost {
+      border: 1px solid rgba(255,255,255,0.3);
+      background: transparent;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+
+    .btn.ghost:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* --- Page layout --- */
+    html{
+      scroll-behavior: smooth;
+    }
+    main.container {
+      padding: 2rem 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      background: linear-gradient(90deg, #00c6ff, #7f00ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 2rem;
+      letter-spacing: 0.6px;
+    }
+
+    /* --- Card layout --- */
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    }
+
+    .form-row.inline {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    #search {
+      flex: 1;
+      padding: 0.7rem;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+
+    #search::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* --- Project columns --- */
+    .grid.cols-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    h3 {
+      color: #00c6ff;
+      font-size: 1.1rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      min-height: 100px;
+    }
+
+    /* --- Project cards --- */
+    .project-card {
+      background: rgba(255,255,255,0.08);
+      padding: 1rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 15px rgba(0,198,255,0.2);
+    }
+
+    .project-card::before {
+      content: "";
+      position: absolute;
+      top: -30%;
+      left: -30%;
+      width: 160%;
+      height: 160%;
+      background: radial-gradient(circle, rgba(0,198,255,0.15), transparent 60%);
+      z-index: 0;
+    }
+
+    .project-card h4 {
+      font-size: 1.1rem;
+      z-index: 2;
+      position: relative;
+    }
+
+    .project-card p {
+      color: rgba(255,255,255,0.8);
+      font-size: 0.9rem;
+      margin-top: 0.4rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* --- Decorative floating shapes --- */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      opacity: 0.15;
+      z-index: 0;
+      filter: blur(60px);
+      animation: floatBlob 10s ease-in-out infinite alternate;
+    }
+
+    .blob.one {
+      top: 10%;
+      left: 15%;
+      width: 200px;
+      height: 200px;
+      background: #00c6ff;
+    }
+
+    .blob.two {
+      bottom: 15%;
+      right: 10%;
+      width: 250px;
+      height: 250px;
+      background: #7f00ff;
+      animation-delay: 3s;
+    }
+
+    @keyframes floatBlob {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-40px) scale(1.1); }
+    }
+
+    /* --- Mobile Nav Toggle --- */
     .menu-toggle {
       display: none;
-      font-size: 1.5rem;
-      background: none;
-      border: none;
       cursor: pointer;
-      color: var(--text-color, #000);
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .menu-toggle span {
+      width: 25px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
     }
 
     @media (max-width: 768px) {
+      .menu-toggle {
+        display: flex;
+      }
+
       .nav-links {
         display: none;
         flex-direction: column;
         position: absolute;
         top: 60px;
         right: 1rem;
-        background: var(--bg-color, #1e1e1e); /* dark mode background */
+        background: rgba(20,20,30,0.95);
         padding: 1rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        z-index: 1000;
-
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: all 0.3s ease;
-      }
-
-      .nav-links a,
-      .nav-links button {
-        color: var(--text-color, #fff); /* text visible in dark mode */
+        border-radius: 10px;
       }
 
       .nav-links.active {
         display: flex;
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      .menu-toggle {
-        display: block;
-        color: var(--text-color, #fff);
-      }
-
-      .btn.ghost {
-        color: var(--text-color, #fff);
-        border: 1px solid var(--text-color, #fff);
       }
     }
-
-    /* Dark mode root variables (optional) */
-    body[data-theme="dark"] {
-      --bg-color: #1e1e1e;
-      --text-color: #ffffff;
-    }
-  </style> -->
+  </style>
 </head>
+
 <body data-page="staff-dashboard">
-  <!-- <a class="skip-link" href="#main">Skip to content</a> -->
+  <div class="blob one"></div>
+  <div class="blob two"></div>
+
   <header>
     <nav class="container">
       <div class="logo">
@@ -77,15 +276,14 @@
         <span>Content Ads</span>
       </div>
 
-                 <!-- Hamburger button -->
-    <div class="menu-toggle" id="menuToggle">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
+      <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
 
       <div class="nav-links" id="navLinks">
-         <a href="staff.html" aria-current="page">Production</a>
+        <a href="staff.html" aria-current="page">Production</a>
         <a href="staff-brand.html">Brands</a>
         <a href="analytics.html">Analytics</a>
         <button class="btn ghost" onclick="logout()">Logout</button>
@@ -93,33 +291,58 @@
     </nav>
   </header>
 
-
   <main id="main" class="container">
-    <h1>Production Team</h1>
+    <h1>Production Team Dashboard</h1>
 
     <section class="card">
       <div class="form-row inline">
-        <button id="loadBtn" class="btn">Load projects</button>
+        <button id="loadBtn" class="btn">Load Projects</button>
         <input id="search" placeholder="Search projects..." />
       </div>
+
       <div class="grid cols-3 mt-2" id="columns">
         <div>
-          <h3>New requests</h3>
-          <div id="col-new" class="stack"></div>
+          <h3>New Requests</h3>
+          <div id="col-new" class="stack">
+            <div class="project-card">
+              <h4>Instagram Ad Visual</h4>
+              <p>Due: Nov 10 — Brand: Motive</p>
+            </div>
+          </div>
         </div>
+
         <div>
           <h3>In Progress</h3>
-          <div id="col-progress" class="stack"></div>
+          <div id="col-progress" class="stack">
+            <div class="project-card">
+              <h4>Twitter Banner Design</h4>
+              <p>Editing Stage — Brand: Aurativ</p>
+            </div>
+          </div>
         </div>
+
         <div>
           <h3>Delivered</h3>
-          <div id="col-delivered" class="stack"></div>
+          <div id="col-delivered" class="stack">
+            <div class="project-card">
+              <h4>Email Campaign Graphics</h4>
+              <p>Delivered — Brand: Stellar</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Load all staff logic from staff.js -->
   <script type="module" src="js/staff.js"></script>
+
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+
+    menuToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+    });
+  </script>
 </body>
 </html>

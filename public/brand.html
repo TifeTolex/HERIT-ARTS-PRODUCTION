@@ -5,60 +5,272 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Brand Profile — Production</title>
   <link rel="stylesheet" href="css/styles.css">
-</head>
-<body data-page="staff-brand">
 
-  <!-- <a class="skip-link" href="#main">Skip to content</a> -->
+  <style>
+    /* --- Background blobs --- */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.35;
+      animation: float 15s infinite ease-in-out alternate;
+      z-index: -1;
+    }
+    .blob1 { width: 400px; height: 400px; background: #7f5af0; top: -80px; left: -100px; }
+    .blob2 { width: 500px; height: 500px; background: #2cb67d; bottom: -120px; right: -150px; animation-delay: 4s; }
+    .blob3 { width: 350px; height: 350px; background: #ff8906; top: 40%; left: 60%; animation-delay: 2s; }
+
+    @keyframes float {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-40px) scale(1.05); }
+    }
+
+    /* --- Page layout --- */
+    body {
+      background: radial-gradient(circle at top left, #16161a, #0f0f11 70%);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    header {
+      position: fixed;
+      width: 100%;
+      top: 0;
+      backdrop-filter: blur(12px);
+      background: rgba(20, 20, 22, 0.6);
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    nav.container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1.5rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a[aria-current="page"] {
+      color: #2cb67d;
+    }
+
+    /* --- Hamburger toggle --- */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 5px;
+    }
+
+    .menu-toggle span {
+      width: 25px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        position: absolute;
+        top: 70px;
+        right: 0;
+        flex-direction: column;
+        background: rgba(22, 22, 26, 0.95);
+        width: 180px;
+        padding: 1rem;
+        border-radius: 12px;
+        display: none;
+      }
+      .nav-links.active { display: flex; }
+      .menu-toggle { display: flex; }
+    }
+
+    main.container {
+      margin-top: 100px;
+      padding: 2rem 1.5rem;
+      max-width: 1200px;
+      margin-inline: auto;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: #fff;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    /* --- Grid --- */
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .cols-2 {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    /* --- Cards --- */
+    .card {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 1.5rem;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+      transition: all 0.3s;
+      animation: fadeIn 0.8s ease;
+    }
+
+    .card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-6px);
+    }
+
+    #projects div, #history div, #profile div {
+      color: #bbb;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    #payment {
+      font-size: 1.1rem;
+      color: #2cb67d;
+      font-weight: 600;
+    }
+
+    button.btn.ghost {
+      border: 1px solid rgba(255,255,255,0.2);
+      background: transparent;
+      color: #fff;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    button.btn.ghost:hover {
+      background: rgba(255,255,255,0.1);
+      color: #2cb67d;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body data-page="staff-brand">
+  <!-- Animated Blobs -->
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+
   <header>
     <nav class="container">
-      <div class="logo"><img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" /><span>Content Ads</span></div>
-      <div>
+      <div class="logo">
+        <img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" />
+        <span>Content Ads</span>
+      </div>
+
+      <div class="menu-toggle" id="menuToggle">
+        <span></span><span></span><span></span>
+      </div>
+
+      <div class="nav-links" id="navLinks">
         <a href="staff.html">Production</a>
-        <a href="staff-brands.html">Brands</a>
+        <a href="staff-brands.html" aria-current="page">Brands</a>
         <a href="analytics.html">Analytics</a>
-        <button class="btn ghost" onclick="logout()">Logout</button>
+        <button class="btn ghost" id="logoutBtn">Logout</button>
       </div>
     </nav>
   </header>
+
   <main id="main" class="container">
-    <h1 id="bname">Brand</h1>
+    <h1 id="bname">Brand Profile</h1>
+
     <section class="grid cols-2">
       <div class="card">
         <h2>Profile</h2>
-        <div id="profile"></div>
+        <div id="profile">
+          <div>Brand Name: Aurativ</div>
+          <div>Category: Clothing</div>
+          <div>Contact: aurativ@gmail.com</div>
+          <div>Joined: March 2025</div>
+        </div>
       </div>
+
       <div class="card">
-        <h2>Payment status</h2>
-        <div id="payment"></div>
+        <h2>Payment Status</h2>
+        <div id="payment">Paid • Active Subscription</div>
       </div>
     </section>
+
     <section class="card mt-2">
       <h2>Projects</h2>
-      <div id="projects"></div>
+      <div id="projects">
+        <div>Summer Ad Campaign</div>
+        <div>Casual Hoodie Shoot</div>
+        <div>Product Review Clips</div>
+      </div>
     </section>
+
     <section class="card mt-2">
-      <h2>Content history</h2>
-      <div id="history"></div>
+      <h2>Content History</h2>
+      <div id="history">
+        <div>August 2025 – “Urban Street Drop” video edits delivered</div>
+        <div>July 2025 – “Motive x Aurativ” collaboration campaign</div>
+        <div>June 2025 – Photo ad assets for “Bold White” release</div>
+      </div>
     </section>
   </main>
-  <script type="module" src="js/staff.js"></script>
-     <script>
-  const menuToggle = document.getElementById('menuToggle');
-  const navLinks = document.getElementById('navLinks');
 
-  menuToggle.addEventListener('click', () => {
-    menuToggle.classList.toggle('active');
-    navLinks.classList.toggle('active');
-  });
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
 
-  // Close menu when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
-      menuToggle.classList.remove('active');
-      navLinks.classList.remove('active');
-    }
-  });
-</script>
+    menuToggle.addEventListener('click', () => {
+      menuToggle.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    });
 
+    document.addEventListener('click', (e) => {
+      if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+        menuToggle.classList.remove('active');
+        navLinks.classList.remove('active');
+      }
+    });
+  </script>
 </body>
 </html>
