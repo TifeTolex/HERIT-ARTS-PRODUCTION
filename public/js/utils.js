@@ -12,61 +12,63 @@ export function setCurrentNav(href){
 }
 
 // =====================
-// TOAST SYSTEM
 // =====================
-export function showToast(message, type = 'info', timeout = 3000) {
-  let container = document.querySelector('.toast-container');
+// UNIVERSAL TOAST HANDLER
+// Prevents duplicate messages
+// =====================
+export function showToast(message, type = "info") {
+  // Reuse or create toast container
+  let container = document.getElementById("toast-container");
   if (!container) {
-    container = document.createElement('div');
-    container.className = 'toast-container';
-    Object.assign(container.style, {
-      position: 'fixed',
-      top: '1rem',
-      right: '1rem',
-      zIndex: 9999,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '.5rem'
-    });
+    container = document.createElement("div");
+    container.id = "toast-container";
+    container.style.position = "fixed";
+    container.style.bottom = "20px";
+    container.style.right = "20px";
+    container.style.zIndex = "9999";
     document.body.appendChild(container);
   }
 
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  Object.assign(toast.style, {
-    padding: '.75rem 1rem',
-    borderRadius: '10px',
-    color: '#fff',
-    fontWeight: '500',
-    boxShadow: '0 4px 10px rgba(0,0,0,.15)',
-    opacity: '0',
-    transform: 'translateY(-10px)',
-    transition: 'all .3s ease'
-  });
+  // 🚫 Prevent duplicate toasts with same text showing at once
+  const existingToast = container.querySelector(`.toast[data-msg="${message}"]`);
+  if (existingToast) {
+    return; // skip duplicate
+  }
 
-  const colors = {
-    success: '#16a34a',
-    error: '#dc2626',
-    info: '#2563eb',
-    warning: '#d97706'
-  };
-  toast.style.background = colors[type] || colors.info;
-
-  toast.textContent = message;
+  // Create new toast
+  const toast = document.createElement("div");
+  toast.className = `toast toast-${type}`;
+  toast.dataset.msg = message;
+  toast.innerHTML = `
+    <div style="
+      background: ${type === "success" ? "#4caf50" : type === "error" ? "#f44336" : "#333"};
+      color: white;
+      padding: 12px 18px;
+      border-radius: 6px;
+      margin-top: 8px;
+      font-size: 0.9rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s, transform 0.3s;
+    ">
+      ${message}
+    </div>
+  `;
   container.appendChild(toast);
 
-  // animate in
-  requestAnimationFrame(() => {
-    toast.style.opacity = '1';
-    toast.style.transform = 'translateY(0)';
-  });
-
-  // auto remove
+  // Animate in
   setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateY(-10px)';
+    toast.firstElementChild.style.opacity = "1";
+    toast.firstElementChild.style.transform = "translateY(0)";
+  }, 20);
+
+  // Auto-remove after 3s
+  setTimeout(() => {
+    toast.firstElementChild.style.opacity = "0";
+    toast.firstElementChild.style.transform = "translateY(10px)";
     setTimeout(() => toast.remove(), 300);
-  }, timeout);
+  }, 3000);
 }
 
 // backward compatibility
@@ -195,16 +197,55 @@ style.textContent = `
 document.head.appendChild(style);
 
 // =====================
-// AUTO SPINNER FOR ALL FORMS
+// LOADING SPINNER HELPER (with auto-reset)
 // =====================
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('form').forEach(form => {
-    const submitBtn = form.querySelector('button[type="submit"]');
-    if (!submitBtn) return;
+export function setLoading(button, isLoading, textWhenDone = null) {
+  if (!button) return;
 
-    form.addEventListener('submit', () => {
-      setLoading(submitBtn, true);
+  // --- Apply loading state ---
+  if (isLoading) {
+    button.disabled = true;
+    button.dataset.originalText = button.innerHTML;
+    button.innerHTML = `
+      <span class="spinner" style="
+        border: 2px solid #fff;
+        border-top: 2px solid transparent;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        margin-right: 6px;
+        animation: spin 0.6s linear infinite;
+        vertical-align: middle;
+      "></span> Processing...
+    `;
+
+    // ✅ Automatically revert spinner if page unloads (redirect, reload, etc.)
+    const unloadHandler = () => {
+      button.disabled = false;
+      button.innerHTML = button.dataset.originalText || textWhenDone || 'Submit';
+    };
+
+    // Save handler ref for cleanup
+    button._unloadHandler = unloadHandler;
+
+    window.addEventListener('beforeunload', unloadHandler);
+    window.addEventListener('pagehide', unloadHandler);
+  }
+
+  // --- Reset to default ---
+  else {
+    button.disabled = false;
+    button.innerHTML = button.dataset.originalText || textWhenDone || 'Submit';
+
+    // Remove event listeners if present
+    if (button._unloadHandler) {
+      window.removeEventListener('beforeunload', button._unloadHandler);
+      window.removeEventListener('pagehide', button._unloadHandler);
+      delete button._unloadHandler;
+    }
+  }
+}
+
       // Button will reset when page reloads, or manually call setLoading(btn, false) in JS after async work
-    });
-  });
-});
+  

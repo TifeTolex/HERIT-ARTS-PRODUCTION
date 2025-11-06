@@ -15,16 +15,19 @@ if (signupForm) {
       password: document.getElementById('password').value,
       businessName: document.getElementById('businessName')?.value.trim() || null,
       industry: document.getElementById('industry')?.value || null,
-      role: document.getElementById('role')?.value || 'brand'
+      role: document.getElementById('role')?.value || 'brand',
     };
 
     try {
       setLoading(btn, true);
 
-      const { token, user } = await api('/api/auth/signup', { 
-        method: 'POST', 
-        body: JSON.stringify(data) 
+      const { token, user } = await api('/api/auth/signup', {
+        method: 'POST',
+        body: JSON.stringify(data),
       });
+
+      // ✅ Immediately stop spinner before redirect
+      setLoading(btn, false);
 
       saveToken(token);
       localStorage.setItem('role', user.role);
@@ -32,18 +35,25 @@ if (signupForm) {
         localStorage.setItem('trialEndsAt', user.trialEndsAt);
       }
 
-      showToast("Signup successful!", "success");
-      const planIntent = document.getElementById('planIntent')?.value;
+      showToast('Signup successful!', 'success');
 
-      window.location.href = user.role === 'staff'
-        ? '/staff.html'
-        : (planIntent === 'now' ? '/subscriptions.html' : '/dashboard.html');
+      const planIntent = document.getElementById('planIntent')?.value;
+      const redirectTo =
+        user.role === 'staff'
+          ? '/staff.html'
+          : planIntent === 'now'
+          ? '/subscriptions.html'
+          : '/dashboard.html';
+
+      // Small delay for smooth UX before redirect
+      setTimeout(() => {
+        window.location.href = redirectTo;
+      }, 600);
 
       signupForm.reset();
     } catch (e) {
       document.getElementById('password').value = '';
-      showToast(e.message || "Signup failed", "error");
-    } finally {
+      showToast(e.message || 'Signup failed', 'error');
       setLoading(btn, false);
     }
   });
@@ -59,16 +69,19 @@ if (loginForm) {
     const data = {
       email: document.getElementById('email').value.trim(),
       password: document.getElementById('password').value,
-      role: document.getElementById('role')?.value || null
+      role: document.getElementById('role')?.value || null,
     };
 
     try {
       setLoading(btn, true);
 
-      const { token, user } = await api('/api/auth/login', { 
-        method: 'POST', 
-        body: JSON.stringify(data) 
+      const { token, user } = await api('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(data),
       });
+
+      // ✅ Stop spinner *before* navigating
+      setLoading(btn, false);
 
       saveToken(token);
       localStorage.setItem('role', user.role);
@@ -76,17 +89,24 @@ if (loginForm) {
         localStorage.setItem('trialEndsAt', user.trialEndsAt);
       }
 
-      showToast("Login successful!", "success");
+      showToast('Login successful!', 'success');
 
-      window.location.href = user.role === 'staff'
-        ? '/staff.html'
-        : '/dashboard.html';
+      const redirectTo =
+        user.role === 'staff' ? '/staff.html' : '/dashboard.html';
+
+      setTimeout(() => {
+        window.location.href = redirectTo;
+      }, 600);
 
       loginForm.reset();
     } catch (e) {
-      document.getElementById('loginPassword').value = '';
-      showToast(e.message || "Login failed", "error");
-    } finally {
+      // Fix: password field ID mismatch
+      const passInput =
+        document.getElementById('loginPassword') ||
+        document.getElementById('password');
+      if (passInput) passInput.value = '';
+
+      showToast(e.message || 'Login failed', 'error');
       setLoading(btn, false);
     }
   });
@@ -98,22 +118,26 @@ if (resetForm) {
   resetForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = resetForm.querySelector('button[type="submit"]');
-
     const email = document.getElementById('rpEmail').value.trim();
+
+    if (!email) {
+      showToast('Please enter your email address', 'warning');
+      return;
+    }
 
     try {
       setLoading(btn, true);
 
       await api('/api/auth/request-password-reset', {
         method: 'POST',
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       });
 
-      showToast('If the email exists, a reset link has been sent.', "success");
+      setLoading(btn, false);
+      showToast('If the email exists, a reset link has been sent.', 'success');
       resetForm.reset();
     } catch (err) {
-      showToast(err.message || 'Request failed', "error");
-    } finally {
+      showToast(err.message || 'Request failed', 'error');
       setLoading(btn, false);
     }
   });
