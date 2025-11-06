@@ -108,12 +108,23 @@ export async function api(path, options = {}) {
       throw new Error(message);
     }
 
-    const data = await res.json();
+    let data;
+try {
+  data = await res.json();
+} catch {
+  data = {};
+}
 
-    // Optional: show success toast for POST/PUT/DELETE (not GET)
-    if (['POST','PUT','DELETE'].includes((options.method || 'GET').toUpperCase())) {
-      showToast('Action completed successfully', 'success');
-    }
+
+   // ✅ Only show success toast if not manually handled
+if (
+  !path.includes('/login') &&
+  !path.includes('/signup') &&
+  ['POST', 'PUT', 'DELETE'].includes((options.method || 'GET').toUpperCase())
+) {
+  showToast('Action completed successfully', 'success');
+}
+
 
     return data;
   } catch (e) {
