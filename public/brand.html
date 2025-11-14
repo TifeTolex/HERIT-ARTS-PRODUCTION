@@ -6,7 +6,7 @@
   <title>Brand Profile — Production</title>
   <link rel="stylesheet" href="css/styles.css">
 
-  <style>
+  <!-- <style>
     /* --- Background blobs --- */
     .blob {
       position: fixed;
@@ -188,10 +188,40 @@
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+  </style> -->
+  <style>
+     /* --- Cards --- */
+    .card {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 1.5rem;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+      transition: all 0.3s;
+      animation: fadeIn 0.8s ease;
+    }
+
+    .card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-6px);
+    }
+
+    #projects div, #history div, #profile div {
+      color: #bbb;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    #payment {
+      font-size: 1.1rem;
+      color: #2cb67d;
+      font-weight: 600;
+    }
   </style>
 </head>
 
-<body data-page="staff-brand">
+<body data-page="staff-brand" data-theme="dark"></body>
   <!-- Animated Blobs -->
   <div class="blob blob1"></div>
   <div class="blob blob2"></div>

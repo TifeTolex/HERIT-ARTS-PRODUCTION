@@ -6,8 +6,8 @@
   <title>Team — Content Ads</title>
   <!-- <link rel="stylesheet" href="css/styles.css"> -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- <style>
     /* --- Page base --- */
     body {
       background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
@@ -216,11 +216,11 @@
     /* spacing utilities */
     .mt-1 { margin-top: 1rem; }
     .mt-2 { margin-top: 2rem; }
-  </style>
+  </style> -->
 </head>
-<body data-page="brand-team">
-  <div class="blob blob1"></div>
-  <div class="blob blob2"></div>
+<body data-page="brand-team"  data-theme="dark">
+  <!-- <div class="blob blob1"></div>
+  <div class="blob blob2"></div> -->
 
   <header>
     <nav class="container">
@@ -229,8 +229,13 @@
         <span>Content Ads</span>
       </div>
 
-      <button class="menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
-
+      <!-- <button class="menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button> -->
+          <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      
       <div class="nav-links" id="navLinks">
         <a href="dashboard.html">Dashboard</a>
         <a href="projects.html">Projects</a>
@@ -344,16 +349,21 @@
   </script>
 
   <script>
-    const menuToggle = document.getElementById('menuToggle');
-    const navLinks = document.getElementById('navLinks');
-    menuToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('active');
-    });
-    document.addEventListener('click', (e) => {
-      if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
-        navLinks.classList.remove('active');
-      }
-    });
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinks = document.getElementById('navLinks');
+
+  menuToggle.addEventListener('click', () => {
+    menuToggle.classList.toggle('active');
+    navLinks.classList.toggle('active');
+  });
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+      menuToggle.classList.remove('active');
+      navLinks.classList.remove('active');
+    }
+  });
   </script>
 </body>
 </html>
