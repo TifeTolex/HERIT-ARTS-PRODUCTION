@@ -27,17 +27,20 @@ const upload = multer({ storage });
 router.post('/', requireAuth, async (req, res) => {
   try {
     const user = req.user;
-    const data = req.body;
+    if (!user.brand) return res.status(400).json({ error: 'Brand not found' });
 
-    const project = new Project({
-      user: user._id,
-      ...data,
+    const proj = {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+      ...req.body,
       status: 'Pending',
-      files: []
-    });
+      files: [],
+      createdAt: new Date()
+    };
 
-    await project.save();
-    res.json({ project });
+    user.brand.projects.push(proj);
+    await user.save();
+
+    res.json({ project: proj });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to create project' });
@@ -47,8 +50,8 @@ router.post('/', requireAuth, async (req, res) => {
 // List my projects
 router.get('/', requireAuth, async (req, res) => {
   try {
-    const projects = await Project.find({ user: req.user._id }).sort({ createdAt: -1 });
-    res.json({ projects });
+    const projects = req.user.brand?.projects || [];
+    res.json({ projects: projects.sort((a, b) => b.createdAt - a.createdAt) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch projects' });
@@ -58,7 +61,7 @@ router.get('/', requireAuth, async (req, res) => {
 // Get single project
 router.get('/:id', requireAuth, async (req, res) => {
   try {
-    const project = await Project.findOne({ _id: req.params.id, user: req.user._id });
+    const project = req.user.brand?.projects.find(p => p.id === req.params.id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
     res.json({ project });
   } catch (err) {
@@ -70,7 +73,7 @@ router.get('/:id', requireAuth, async (req, res) => {
 // Upload files to project
 router.post('/:id/upload', requireAuth, upload.array('files'), async (req, res) => {
   try {
-    const project = await Project.findOne({ _id: req.params.id, user: req.user._id });
+    const project = req.user.brand?.projects.find(p => p.id === req.params.id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
 
     if (!req.files?.length) return res.json({ files: project.files });
@@ -83,7 +86,7 @@ router.post('/:id/upload', requireAuth, upload.array('files'), async (req, res) 
     }));
 
     project.files.push(...newFiles);
-    await project.save();
+    await req.user.save();
     res.json({ files: project.files });
   } catch (err) {
     console.error(err);
@@ -94,11 +97,11 @@ router.post('/:id/upload', requireAuth, upload.array('files'), async (req, res) 
 // Approve / mark complete
 router.post('/:id/approve', requireAuth, async (req, res) => {
   try {
-    const project = await Project.findOne({ _id: req.params.id, user: req.user._id });
+    const project = req.user.brand?.projects.find(p => p.id === req.params.id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
 
     project.status = 'Completed';
-    await project.save();
+    await req.user.save();
     res.json({ project });
   } catch (err) {
     console.error(err);
@@ -109,11 +112,11 @@ router.post('/:id/approve', requireAuth, async (req, res) => {
 // Request changes
 router.post('/:id/changes', requireAuth, async (req, res) => {
   try {
-    const project = await Project.findOne({ _id: req.params.id, user: req.user._id });
+    const project = req.user.brand?.projects.find(p => p.id === req.params.id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
 
     project.status = 'In Progress';
-    await project.save();
+    await req.user.save();
     res.json({ project });
   } catch (err) {
     console.error(err);
@@ -126,7 +129,8 @@ router.post('/:id/changes', requireAuth, async (req, res) => {
 // List all projects
 router.get('/admin/all', requireAuth, async (req, res) => {
   try {
-    const projects = await Project.find().populate('user', 'email').sort({ createdAt: -1 });
+    const users = await User.find({ 'brand.projects.0': { $exists: true } });
+    const projects = users.flatMap(u => u.brand?.projects.map(p => ({ ...p, brandEmail: u.email })) || []);
     res.json({ projects });
   } catch (err) {
     console.error(err);
@@ -137,7 +141,15 @@ router.get('/admin/all', requireAuth, async (req, res) => {
 // Get single project by ID
 router.get('/admin/:id', requireAuth, async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id).populate('user', 'email');
+    const users = await User.find({ 'brand.projects.0': { $exists: true } });
+    let project;
+    for (const u of users) {
+      project = u.brand.projects.find(p => p.id === req.params.id);
+      if (project) {
+        project.brandEmail = u.email;
+        break;
+      }
+    }
     if (!project) return res.status(404).json({ error: 'Project not found' });
     res.json({ project });
   } catch (err) {
@@ -149,12 +161,20 @@ router.get('/admin/:id', requireAuth, async (req, res) => {
 // Assign project to staff
 router.post('/admin/:id/assign', requireAuth, async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const { email } = req.body;
+    const users = await User.find({ 'brand.projects.0': { $exists: true } });
+    let project, owner;
+    for (const u of users) {
+      project = u.brand.projects.find(p => p.id === req.params.id);
+      if (project) {
+        owner = u;
+        project.assignee = email;
+        project.status = 'In Progress';
+        await owner.save();
+        break;
+      }
+    }
     if (!project) return res.status(404).json({ error: 'Project not found' });
-
-    project.assignee = req.body.email;
-    project.status = 'In Progress';
-    await project.save();
     res.json({ project });
   } catch (err) {
     console.error(err);
@@ -165,7 +185,15 @@ router.post('/admin/:id/assign', requireAuth, async (req, res) => {
 // Deliver project with optional files
 router.post('/admin/:id/deliver', requireAuth, upload.array('files'), async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const users = await User.find({ 'brand.projects.0': { $exists: true } });
+    let project, owner;
+    for (const u of users) {
+      project = u.brand.projects.find(p => p.id === req.params.id);
+      if (project) {
+        owner = u;
+        break;
+      }
+    }
     if (!project) return res.status(404).json({ error: 'Project not found' });
 
     if (req.files?.length) {
@@ -179,7 +207,7 @@ router.post('/admin/:id/deliver', requireAuth, upload.array('files'), async (req
     }
 
     project.status = 'Delivered';
-    await project.save();
+    await owner.save();
     res.json({ project });
   } catch (err) {
     console.error(err);
@@ -190,16 +218,17 @@ router.post('/admin/:id/deliver', requireAuth, upload.array('files'), async (req
 // Admin analytics summary
 router.get('/admin-analytics/summary', requireAuth, async (req, res) => {
   try {
-    const projects = await Project.find().populate('user', 'email');
-    const completed = projects.filter(p => p.status === 'Completed').length;
-    const revenue = projects.length * 200; // dummy value
-    const activeBrands = new Set(projects.map(p => p.user.email)).size;
+    const users = await User.find({ 'brand.projects.0': { $exists: true } });
+    const allProjects = users.flatMap(u => u.brand.projects || []);
+    const completed = allProjects.filter(p => p.status === 'Completed').length;
+    const revenue = allProjects.length * 200; // dummy value
+    const activeBrands = new Set(allProjects.map(p => p.brandEmail)).size;
 
     res.json({
       revenueFormatted: `$${revenue}`,
       projectsCompleted: completed,
       activeBrands,
-      totalProjects: projects.length
+      totalProjects: allProjects.length
     });
   } catch (err) {
     console.error(err);
