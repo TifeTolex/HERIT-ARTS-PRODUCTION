@@ -4,7 +4,6 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { requireAuth } from '../middleware/auth.js';
-import Project from '../data/models/Project.js';
 import User from '../data/models/User.js';
 
 const router = express.Router();
