@@ -6,17 +6,49 @@
   <title>Signup — Content Ads</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    body {
-      min-height: 100vh;
-      background: radial-gradient(circle at top left, #0b0b0b, #151515);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-    }
+  /* Make body take full height and center content */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* full viewport height */
+  margin: 0;
+  background: var(--bg-color); /* optional, set your page bg */
+  font-family: sans-serif;
+}
+
+/* Center main container */
+main.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.4);
+  animation: fadeIn 1s ease-in-out;
+  max-width: 400px; /* optional: keep it narrow on big screens */
+  width: 90%;
+}
+
+/* Optional: smooth fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Reset form styling */
+#resetCard {
+  display: none;
+  width: 100%;
+}
 
     header {
       background: transparent;
-      position: absolute;
+      position: fixed;
       top: 0;
       width: 100%;
       z-index: 10;
@@ -164,7 +196,7 @@
     <nav class="container">
       <div class="logo">
         <img src="assets/logo-placeholder.svg" alt="Content Ads logo" width="28" height="28" />
-        <span>Content Ads</span>
+        <span>H'Arts Studio</span>
       </div>
 
       <div class="menu-toggle" id="menuToggle">

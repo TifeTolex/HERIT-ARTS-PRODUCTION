@@ -8,41 +8,46 @@
   
 
   <style>
-    main{
-      
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      padding: 6rem 1rem 3rem;
-      position: relative;
-      overflow: hidden;
-  
-      background: var(--card-bg);
-      border: 1px solid rgba(255,255,255,0.1);
-      backdrop-filter: blur(12px);
-      border-radius: 20px;
-      box-shadow: 0 0 40px rgba(0,0,0,0.4);
-      animation: fadeIn 1s ease-in-out;
-    }
+    /* Make body take full height and center content */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* full viewport height */
+  margin: 0;
+  background: var(--bg-color); /* optional, set your page bg */
+  font-family: sans-serif;
+}
 
-    main.container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 10rem;
-    }
+/* Center main container */
+main.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.4);
+  animation: fadeIn 1s ease-in-out;
+  max-width: 400px; /* optional: keep it narrow on big screens */
+  width: 90%;
+}
 
- 
-    #resetCard {
-      display: none;
-      animation: fadeIn 0.8s ease forwards;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+/* Optional: smooth fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Reset form styling */
+#resetCard {
+  display: none;
+  width: 100%;
+}
+
   </style>
 </head>
 <body data-page="login" data-theme="dark">
