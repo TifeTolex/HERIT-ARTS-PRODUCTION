@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Project Details — Production</title>
   <link rel="stylesheet" href="css/styles.css">
-
-
 </head>
 <body data-page="staff-project" data-theme="dark">
   <!-- Background Blobs -->
@@ -46,15 +44,32 @@
         <button class="tab" data-tab="files">📁 Files</button>
       </div>
 
-      <div id="tab-brief"></div>
+      <!-- Brief tab: two-column layout -->
+      <div id="tab-brief" class="brief-grid">
+        <div class="left-column">
+          <h3 id="proj-title">Project Title</h3>
+          <div><strong>Status:</strong> <span class="status" id="proj-status">Pending</span></div>
+          <div><strong>Deadline:</strong> <span id="proj-deadline">—</span></div>
+          <div><strong>Goal:</strong> <span id="proj-goal">—</span></div>
+          <div><strong>Notes:</strong> <span id="proj-notes">—</span></div>
+        </div>
+        <div class="right-column">
+          <div><strong>Brand:</strong> <span id="proj-brand">—</span></div>
+          <div><strong>Audience:</strong> <span id="proj-audience">—</span></div>
+          <div><strong>Tone:</strong> <span id="proj-tone">—</span></div>
+          <div><strong>Usage:</strong> <span id="proj-usage">—</span></div>
+          <div><strong>Features:</strong> <span id="proj-features">—</span></div>
+        </div>
+      </div>
+
       <div id="tab-assets" hidden></div>
       <div id="tab-notes" hidden></div>
       <div id="tab-files" hidden></div>
     </section>
 
     <section class="card mt-2">
-      <h2>Upload Content</h2>
-      <input type="file" id="upload" multiple />
+      <h2>Upload / Deliver Content</h2>
+      <!-- JS will insert the file input before deliverBtn -->
       <button class="btn" id="deliverBtn">Deliver to Brand</button>
     </section>
   </main>
@@ -75,18 +90,6 @@
         menuToggle.classList.remove('active');
         navLinks.classList.remove('active');
       }
-    });
-
-    // Tab logic
-    const tabs = document.querySelectorAll('.tab');
-    const sections = document.querySelectorAll('[id^="tab-"]');
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        sections.forEach(s => s.hidden = true);
-        tab.classList.add('active');
-        document.getElementById('tab-' + tab.dataset.tab).hidden = false;
-      });
     });
   </script>
 </body>

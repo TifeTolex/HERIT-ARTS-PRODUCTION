@@ -586,8 +586,7 @@ label {
 } 
 
 label:hover{
-   border-color: #0F62FE;
-  color: #0F62FE;
+  /* border-color: #0F62FE; */
   box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.15);
   outline: none;
 }
@@ -1450,3 +1449,19 @@ body::after {
   z-index: 10;
   animation: fadeIn 1s ease;
    }
+.brief-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.left-column, .right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.status.Pending { color: orange; }
+.status.In Progress { color: blue; }
+.status.Delivered { color: green; }
+.status.Completed { color: green; }

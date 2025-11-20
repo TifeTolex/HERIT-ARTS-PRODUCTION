@@ -126,11 +126,17 @@ router.post('/:id/changes', requireAuth, async (req, res) => {
 
 // ---------------- Admin / Staff Routes ----------------
 
-// List all projects
+// List all projects for staff/admin
 router.get('/admin/all', requireAuth, async (req, res) => {
   try {
     const users = await User.find({ 'brand.projects.0': { $exists: true } });
-    const projects = users.flatMap(u => u.brand?.projects.map(p => ({ ...p, brandEmail: u.email })) || []);
+    const projects = users.flatMap(u => 
+      u.brand?.projects.map(p => ({
+        ...p,
+        brandEmail: u.email,
+        brandName: u.brand.businessName || u.brand.name || 'Brand'
+      })) || []
+    );
     res.json({ projects });
   } catch (err) {
     console.error(err);
@@ -138,7 +144,7 @@ router.get('/admin/all', requireAuth, async (req, res) => {
   }
 });
 
-// Get single project by ID
+// Get single project by ID for staff/admin
 router.get('/admin/:id', requireAuth, async (req, res) => {
   try {
     const users = await User.find({ 'brand.projects.0': { $exists: true } });
@@ -147,6 +153,7 @@ router.get('/admin/:id', requireAuth, async (req, res) => {
       project = u.brand.projects.find(p => p.id === req.params.id);
       if (project) {
         project.brandEmail = u.email;
+        project.brandName = u.brand.businessName || u.brand.name || 'Brand';
         break;
       }
     }
@@ -171,6 +178,8 @@ router.post('/admin/:id/assign', requireAuth, async (req, res) => {
         project.assignee = email;
         project.status = 'In Progress';
         await owner.save();
+        project.brandEmail = u.email;
+        project.brandName = u.brand.businessName || u.brand.name || 'Brand';
         break;
       }
     }
@@ -208,6 +217,10 @@ router.post('/admin/:id/deliver', requireAuth, upload.array('files'), async (req
 
     project.status = 'Delivered';
     await owner.save();
+
+    project.brandEmail = owner.email;
+    project.brandName = owner.brand.businessName || owner.brand.name || 'Brand';
+
     res.json({ project });
   } catch (err) {
     console.error(err);
@@ -219,7 +232,14 @@ router.post('/admin/:id/deliver', requireAuth, upload.array('files'), async (req
 router.get('/admin-analytics/summary', requireAuth, async (req, res) => {
   try {
     const users = await User.find({ 'brand.projects.0': { $exists: true } });
-    const allProjects = users.flatMap(u => u.brand.projects || []);
+    const allProjects = users.flatMap(u => 
+      u.brand.projects.map(p => ({
+        ...p,
+        brandEmail: u.email,
+        brandName: u.brand.businessName || u.brand.name || 'Brand'
+      })) || []
+    );
+
     const completed = allProjects.filter(p => p.status === 'Completed').length;
     const revenue = allProjects.length * 200; // dummy value
     const activeBrands = new Set(allProjects.map(p => p.brandEmail)).size;
@@ -235,5 +255,6 @@ router.get('/admin-analytics/summary', requireAuth, async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch analytics' });
   }
 });
+
 
 export default router;

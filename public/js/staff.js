@@ -27,7 +27,7 @@ function renderProjects(list) {
   const tpl = p => `
     <article class="card">
       <h4>${p.title || p.name || 'Untitled Project'}</h4>
-      <div class="text-muted">${p.brandName || p.brand?.name || 'Client project'}</div>
+      <div class="text-muted">${p.brandName || p.brandEmail || 'Client project'}</div>
       <div>Deadline: ${p.deadline ? new Date(p.deadline).toLocaleDateString() : '—'}</div>
       <div>Status: <span class="status ${String(p.status).replace(/\s+/g,'')}">${p.status}</span></div>
       <div class="form-row inline mt-1">
@@ -68,17 +68,25 @@ async function loadProjectDetail() {
     const p = await api(`/api/projects/admin/${id}`);
 
     // Brief tab
-    document.getElementById('tab-brief').innerHTML = `
+  document.getElementById('tab-brief').innerHTML = `
+  <div class="brief-grid">
+    <div class="left-column">
       <h3>${p.title || p.name}</h3>
       <div><strong>Status:</strong> <span class="status ${String(p.status||'Pending').replace(/\s+/g,'')}">${p.status}</span></div>
       <div><strong>Deadline:</strong> ${p.deadline ? new Date(p.deadline).toLocaleDateString() : '—'}</div>
       <div><strong>Goal:</strong> ${p.primaryGoal || p.goal || '—'}</div>
-      <div><strong>Features:</strong><br/>${(p.keyFeatures || p.features || '').replace(/\n/g,'<br/>') || '—'}</div>
+      <div><strong>Notes:</strong> ${p.notes || '—'}</div>
+    </div>
+    <div class="right-column">
+      <div><strong>Brand:</strong> ${p.brandEmail || p.brand?.name || '—'}</div>
       <div><strong>Audience:</strong> ${(p.targetAudience || p.audience || []).join(', ') || '—'}</div>
       <div><strong>Tone:</strong> ${(p.toneOfVoice || p.tones || []).join(', ') || '—'}</div>
       <div><strong>Usage:</strong> ${(p.usage || []).join(', ') || '—'}</div>
-      <div><strong>Notes:</strong> ${p.notes || '—'}</div>
-    `;
+      <div><strong>Features:</strong> ${(p.keyFeatures || p.features || '').replace(/\n/g,'<br/>') || '—'}</div>
+    </div>
+  </div>
+`;
+
 
     // Assets tab
     document.getElementById('tab-assets').innerHTML = `
@@ -91,9 +99,7 @@ async function loadProjectDetail() {
     // Notes tab
     document.getElementById('tab-notes').innerHTML = p.notes || '<div class="text-muted">No notes</div>';
 
-    // =====================
-    // Files tab (brand + staff uploads)
-    // =====================
+    // Files tab
     document.getElementById('tab-files').innerHTML = (p.files && p.files.length)
       ? p.files.map(f => `
           <div class="row mt-1">
@@ -128,7 +134,7 @@ async function loadProjectDetail() {
           });
 
           toast('Delivered to brand ✅', 'success');
-          loadProjectDetail(); // reload to refresh files tab
+          loadProjectDetail();
         } catch (err) {
           toast('Delivery failed: ' + err.message, 'error');
         }
