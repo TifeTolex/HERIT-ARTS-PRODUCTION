@@ -89,7 +89,7 @@ if (loginForm) {
         localStorage.setItem('trialEndsAt', user.trialEndsAt);
       }
 
-      showToast('Login successful!', 'success');
+      // showToast('Login successful!', 'success');
 
       const redirectTo =
         user.role === 'staff' ? '/staff.html' : '/dashboard.html';

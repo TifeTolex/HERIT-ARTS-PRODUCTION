@@ -143,7 +143,7 @@ export async function api(path, options = {}) {
     const data = await res.json();
 
     if (["POST", "PUT", "DELETE"].includes((options.method || "GET").toUpperCase())) {
-      showToast("Action completed successfully", "success");
+      showToast("Login successful", "success");
     }
 
     return data;

@@ -58,8 +58,8 @@ body::after {
 
 /* Keep header nav aligned */
     header .container {
-      max-width: 900px;
-      margin:  auto;
+      max-width: 700px;
+      /* margin:  auto; */
       display: flex;
       align-items: left;
       justify-content: space-between;
@@ -71,7 +71,7 @@ main.container {
   margin-top: 5rem; 
   padding: 1rem;
   z-index: 10;
-      animation: fadeIn 1s ease;
+  animation: fadeIn 1s ease;
     }
 
    .grid.cols-3 {
@@ -102,7 +102,7 @@ header {
   top: 0;
   width: 100%;
   background: transparent;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(25px);
   /* position: fixed; */
   left: 0;
   z-index: 2000;
@@ -110,7 +110,7 @@ header {
   /* z-index: 5; */
   position: fixed;
   z-index: 1000;
-  padding: 12px 0;
+  padding: 2px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -376,6 +376,7 @@ nav a:hover {
   box-shadow: 0 0 15px rgba(180, 124, 255, 0.6);
   animation: pulseGlow 3s ease-in-out infinite;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: float 5s ease-in-out infinite;
 }
 
 .btn-new::before {
@@ -1225,6 +1226,7 @@ nav.container {
   min-width: 220px;
   transition: 0.3s ease;
   backdrop-filter: blur(8px);
+  animation: float 5s ease-in-out infinite;
 }
 
 .plan-card:hover {
@@ -1289,7 +1291,13 @@ nav.container {
   box-shadow: 0 0 25px rgba(0,0,0,0.3);
   margin-top: 1rem;
   overflow: hidden;
+  animation: float 5s ease-in-out infinite;
 }
+
+  @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
 
 
     .card.kpi:hover {
