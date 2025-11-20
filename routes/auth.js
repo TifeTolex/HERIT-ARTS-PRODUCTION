@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { sendWelcomeEmail, sendPasswordResetEmail } from '../utils/email.js';
-import User from '../data/models/User.js'; // Mongoose User model
+import User from '../data/models/User.js';
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'devsupersecret';
@@ -20,160 +20,151 @@ function generateToken(user) {
 
 // ================== BRAND SIGNUP ==================
 router.post('/signup', async (req, res) => {
-  const { firstName, lastName, email, password, businessName, industry, brandColor, typography } = req.body;
+  try {
+    const { firstName, lastName, email, password, businessName, industry, brandColor, typography } = req.body;
+    if (!email || !password || !firstName || !lastName)
+      return res.status(400).json({ success: false, error: 'Missing required fields' });
 
-  if (!email || !password || !firstName || !lastName) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    const normalizedEmail = email.trim().toLowerCase();
+    if (await User.findOne({ email: normalizedEmail }))
+      return res.status(400).json({ success: false, error: 'User already exists' });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      firstName,
+      lastName,
+      email: normalizedEmail,
+      password: hashedPassword,
+      role: 'brand',
+      brand: {
+        id: crypto.randomUUID(),
+        businessName,
+        industry,
+        brandColor,
+        typography,
+        members: [{ email: normalizedEmail, role: 'Admin' }],
+        subscription: { plan: null, status: 'none', renewsAt: null, gateway: null },
+        projects: [],
+        history: []
+      }
+      // trialEndsAt auto-set in schema
+    });
+
+    await user.save();
+    sendWelcomeEmail(user.email, user.firstName).catch(console.error);
+
+    res.json({
+      success: true,
+      token: generateToken(user),
+      user: { id: user._id, email: user.email, role: user.role, trialEndsAt: user.trialEndsAt }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Signup failed' });
   }
-
-  const normalizedEmail = email.trim().toLowerCase();
-  const existingUser = await User.findOne({ email: normalizedEmail });
-  if (existingUser) {
-    return res.status(400).json({ error: 'User already exists' });
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = new User({
-    firstName,
-    lastName,
-    email: normalizedEmail,
-    password: hashedPassword,
-    role: 'brand',
-    brand: {
-      id: crypto.randomUUID(),
-      businessName,
-      industry,
-      brandColor,
-      typography,
-      members: [{ email: normalizedEmail, role: 'Admin' }],
-      subscription: { plan: null, status: 'none', renewsAt: null, gateway: null },
-      projects: [],
-      history: []
-    }
-    // ⚡ trialEndsAt is auto-set in the schema
-  });
-
-  await user.save();
-
-  sendWelcomeEmail(user.email, user.firstName).catch(err => console.error('Email error:', err));
-
-  const token = generateToken(user);
-  res.json({
-    success: true,
-    token,
-    user: {
-      id: user._id,
-      email: user.email,
-      role: user.role,
-      trialEndsAt: user.trialEndsAt
-    }
-  });
 });
 
 // ================== STAFF SIGNUP ==================
 router.post('/staff-signup', async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+  try {
+    const { firstName, lastName, email, password } = req.body;
+    if (!email || !password || !firstName || !lastName)
+      return res.status(400).json({ success: false, error: 'Missing required fields' });
 
-  if (!email || !password || !firstName || !lastName) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    const normalizedEmail = email.trim().toLowerCase();
+    if (await User.findOne({ email: normalizedEmail }))
+      return res.status(400).json({ success: false, error: 'User already exists' });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      firstName,
+      lastName,
+      email: normalizedEmail,
+      password: hashedPassword,
+      role: 'staff'
+    });
+
+    await user.save();
+    sendWelcomeEmail(user.email, user.firstName).catch(console.error);
+
+    res.json({
+      success: true,
+      token: generateToken(user),
+      user: { id: user._id, email: user.email, role: user.role, trialEndsAt: user.trialEndsAt }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Staff signup failed' });
   }
-
-  const normalizedEmail = email.trim().toLowerCase();
-  const existingUser = await User.findOne({ email: normalizedEmail });
-  if (existingUser) {
-    return res.status(400).json({ error: 'User already exists' });
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = new User({
-    firstName,
-    lastName,
-    email: normalizedEmail,
-    password: hashedPassword,
-    role: 'staff'
-    // trialEndsAt is still auto-set
-  });
-
-  await user.save();
-
-  sendWelcomeEmail(user.email, user.firstName).catch(err => console.error('Email error:', err));
-
-  const token = generateToken(user);
-  res.json({
-    success: true,
-    token,
-    user: {
-      id: user._id,
-      email: user.email,
-      role: user.role,
-      trialEndsAt: user.trialEndsAt
-    }
-  });
 });
 
 // ================== LOGIN ==================
 router.post('/login', async (req, res) => {
-  const { email, password, role } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'Missing email or password' });
+  try {
+    const { email, password, role } = req.body;
+    if (!email || !password)
+      return res.status(400).json({ success: false, error: 'Missing email or password' });
 
-  const normalizedEmail = email.trim().toLowerCase();
-  const user = await User.findOne({ email: normalizedEmail });
-  if (!user) return res.status(400).json({ error: 'Invalid email or password' });
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
+    if (!user) return res.status(400).json({ success: false, error: 'Invalid email or password' });
 
-  const validPassword = await bcrypt.compare(password, user.password);
-  if (!validPassword) return res.status(400).json({ error: 'Invalid email or password' });
+    if (!(await bcrypt.compare(password, user.password)))
+      return res.status(400).json({ success: false, error: 'Invalid email or password' });
 
-  if (role && user.role.toLowerCase() !== role.toLowerCase()) {
-    return res.status(403).json({ error: `Role mismatch: account is '${user.role}'` });
+    if (role && user.role.toLowerCase() !== role.toLowerCase())
+      return res.status(403).json({ success: false, error: `Role mismatch: account is '${user.role}'` });
+
+    res.json({
+      success: true,
+      token: generateToken(user),
+      user: { id: user._id, email: user.email, role: user.role, trialEndsAt: user.trialEndsAt }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Login failed' });
   }
-
-  const token = generateToken(user);
-  return res.json({
-    success: true,
-    token,
-    user: {
-      id: user._id,
-      email: user.email,
-      role: user.role,
-      trialEndsAt: user.trialEndsAt
-    }
-  });
 });
 
 // ================== REQUEST PASSWORD RESET ==================
 router.post('/request-password-reset', async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ error: 'Email is required' });
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ success: false, error: 'Email is required' });
 
-  const normalizedEmail = email.trim().toLowerCase();
-  const user = await User.findOne({ email: normalizedEmail });
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
+    if (user) {
+      const resetToken = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '15m' });
+      sendPasswordResetEmail(user.email, resetToken).catch(console.error);
+    }
 
-  if (!user) return res.json({ success: true, message: 'If the email exists, a reset link has been sent.' });
-
-  const resetToken = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '15m' });
-  sendPasswordResetEmail(user.email, resetToken).catch(err => console.error('Failed to send reset email:', err));
-
-  res.json({ success: true, message: 'If the email exists, a reset link has been sent.' });
+    res.json({ success: true, message: 'If the email exists, a reset link has been sent.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Failed to request password reset' });
+  }
 });
 
 // ================== RESET PASSWORD ==================
 router.post('/reset-password', async (req, res) => {
-  const { token, newPassword } = req.body;
-  if (!token || !newPassword) return res.status(400).json({ error: 'Missing token or new password' });
-
   try {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword)
+      return res.status(400).json({ success: false, error: 'Missing token or new password' });
+
     const decoded = jwt.verify(token, JWT_SECRET);
     const user = await User.findOne({ _id: decoded.id, email: decoded.email });
-    if (!user) return res.status(400).json({ error: 'Invalid token or user not found' });
+    if (!user) return res.status(400).json({ success: false, error: 'Invalid token or user not found' });
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
 
     res.json({ success: true, message: 'Password reset successfully. You can now log in.' });
-  } catch (err) {
-    return res.status(400).json({ error: 'Invalid or expired token' });
+  } catch {
+    res.status(400).json({ success: false, error: 'Invalid or expired token' });
   }
 });
 

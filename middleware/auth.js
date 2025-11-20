@@ -8,27 +8,28 @@ export async function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
-  if (!token) {
-    return res.status(401).json({ error: 'No token provided. Please log in.' });
-  }
+  if (!token) return res.status(401).json({ error: 'No token provided. Please log in.' });
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     const user = await User.findById(decoded.id);
-    if (!user) {
-      return res.status(401).json({ error: 'User not found. Please log in.' });
+
+    if (!user) return res.status(401).json({ error: 'User not found. Please log in.' });
+
+    req.user = user; // attach user to request
+
+    // Only block routes that require active subscription
+    // e.g., /api/projects POST
+    if (req.path.startsWith('/projects') && req.method === 'POST') {
+      const now = new Date();
+      const hasActiveSub = user.brand?.subscription?.status === 'active';
+      const withinTrial = user.trialEndsAt && now <= new Date(user.trialEndsAt);
+
+      if (!hasActiveSub && !withinTrial) {
+        return res.status(402).json({ error: 'Trial expired. Please subscribe to continue.' });
+      }
     }
 
-    // ✅ Trial / subscription check
-    const now = new Date();
-    const hasActiveSub = user.brand?.subscription?.status === 'active';
-    const withinTrial = user.trialEndsAt && now <= user.trialEndsAt;
-
-    if (!hasActiveSub && !withinTrial) {
-      return res.status(402).json({ error: 'Trial expired. Please subscribe to continue.' });
-    }
-
-    req.user = user; // attach full user document
     return next();
   } catch (err) {
     if (err.name === 'TokenExpiredError') {

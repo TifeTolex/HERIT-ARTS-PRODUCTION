@@ -2,21 +2,17 @@
 // ENV CONFIG
 // =====================
 const API_BASE = window.location.hostname.includes("localhost")
-  ? "" // local dev
-  : ""; // render deployment
+  ? ""
+  : "";
 
 // =====================
 // SHORT SELECTORS
 // =====================
-export function $(selector, ctx = document) {
-  return ctx.querySelector(selector);
-}
-export function $all(selector, ctx = document) {
-  return Array.from(ctx.querySelectorAll(selector));
-}
+export const $ = (s, c = document) => c.querySelector(s);
+export const $all = (s, c = document) => Array.from(c.querySelectorAll(s));
 
 // =====================
-// NAV ACTIVE + TOGGLE HANDLER
+// NAV HANDLER
 // =====================
 export function setCurrentNav(href) {
   const link = document.querySelector(`nav a[href="${href}"]`);
@@ -25,104 +21,79 @@ export function setCurrentNav(href) {
 
 document.addEventListener("DOMContentLoaded", () => {
   const nav = document.querySelector("nav");
-  const menuToggle = document.querySelector(".menu-toggle");
+  const toggle = document.querySelector(".menu-toggle");
 
-  if (menuToggle && nav) {
-    menuToggle.addEventListener("click", (e) => {
+  if (toggle && nav) {
+    toggle.addEventListener("click", (e) => {
       e.stopPropagation();
       nav.classList.toggle("open");
     });
   }
 
   document.addEventListener("click", (e) => {
-    if (nav?.classList.contains("open") && !nav.contains(e.target) && !menuToggle.contains(e.target)) {
+    if (nav?.classList.contains("open") && !nav.contains(e.target) && !toggle.contains(e.target)) {
       nav.classList.remove("open");
     }
   });
 
-  // Close nav when clicking any link
-  document.querySelectorAll("nav a").forEach((link) =>
-    link.addEventListener("click", () => nav.classList.remove("open"))
+  document.querySelectorAll("nav a").forEach((l) =>
+    l.addEventListener("click", () => nav.classList.remove("open"))
   );
 });
 
 // =====================
-// TOAST HANDLER
+// TOAST - SAFE VERSION
 // =====================
-export function showToast(message, type = "info") {
-  let container = document.getElementById("toast-container");
-  if (!container) {
-    container = document.createElement("div");
-    container.id = "toast-container";
-    container.style.position = "fixed";
-    container.style.bottom = "20px";
-    container.style.right = "20px";
-    container.style.zIndex = "9999";
-    document.body.appendChild(container);
+export function toast(message, type = "info") {
+  let box = document.getElementById("toast-box");
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "toast-box";
+    box.style.position = "fixed";
+    box.style.bottom = "20px";
+    box.style.right = "20px";
+    box.style.zIndex = 999999;
+    document.body.appendChild(box);
   }
 
-  // prevent duplicates
-  if (container.querySelector(`.toast[data-msg="${message}"]`)) return;
+  const item = document.createElement("div");
+  item.className = "toast-item";
+  item.style.background = type === "error" ? "#f44336" : type === "success" ? "#4caf50" : "#333";
+  item.style.color = "#fff";
+  item.style.padding = "12px 18px";
+  item.style.borderRadius = "6px";
+  item.style.marginTop = "8px";
+  item.style.opacity = "0";
+  item.style.transition = "opacity .25s";
+  item.textContent = message;
 
-  const toast = document.createElement("div");
-  toast.className = `toast toast-${type}`;
-  toast.dataset.msg = message;
-  toast.innerHTML = `
-    <div style="
-      background: ${type === "success" ? "#4caf50" : type === "error" ? "#f44336" : "#333"};
-      color: white;
-      padding: 12px 18px;
-      border-radius: 6px;
-      margin-top: 8px;
-      font-size: 0.9rem;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 0.3s, transform 0.3s;
-    ">
-      ${message}
-    </div>
-  `;
-  container.appendChild(toast);
+  box.appendChild(item);
 
+  setTimeout(() => (item.style.opacity = "1"), 50);
   setTimeout(() => {
-    toast.firstElementChild.style.opacity = "1";
-    toast.firstElementChild.style.transform = "translateY(0)";
-  }, 20);
-
-  setTimeout(() => {
-    toast.firstElementChild.style.opacity = "0";
-    toast.firstElementChild.style.transform = "translateY(10px)";
-    setTimeout(() => toast.remove(), 300);
+    item.style.opacity = "0";
+    setTimeout(() => item.remove(), 300);
   }, 3000);
-}
-
-export function toast(msg, type = "info") {
-  showToast(msg, type);
 }
 
 // =====================
 // AUTH HELPERS
 // =====================
-export function saveToken(token) {
-  localStorage.setItem("token", token);
-}
-export function getToken() {
-  return localStorage.getItem("token");
-}
-export function clearToken() {
-  localStorage.removeItem("token");
-}
+export const saveToken = (t) => localStorage.setItem("token", t);
+export const getToken = () => localStorage.getItem("token");
+export const clearToken = () => localStorage.removeItem("token");
+
 export function requireAuthOrRedirect() {
   if (!getToken()) window.location.href = "/login.html";
 }
+
 export function logout() {
   clearToken();
   window.location.href = "/login.html";
 }
 
 // =====================
-// API WRAPPER
+// API WRAPPER — BULLETPROOF VERSION
 // =====================
 export async function api(path, options = {}) {
   const headers = options.headers || {};
@@ -131,94 +102,57 @@ export async function api(path, options = {}) {
   if (token) headers["Authorization"] = `Bearer ${token}`;
   if (!(options.body instanceof FormData)) headers["Content-Type"] = "application/json";
 
+  let res;
+
   try {
-    const res = await fetch(API_BASE + path, { ...options, headers });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: res.statusText }));
-      const msg = err.error || `Error ${res.status}: ${res.statusText}`;
-      showToast(msg, "error");
-      throw new Error(msg);
-    }
-
-    const data = await res.json();
-
-    if (["POST", "PUT", "DELETE"].includes((options.method || "GET").toUpperCase())) {
-      showToast("Login successful", "success");
-    }
-
-    return data;
+    res = await fetch(API_BASE + path, { ...options, headers });
   } catch (err) {
-    showToast(err.message || "Network error", "error");
+    toast("Network error", "error");
     throw err;
   }
-}
 
-// =====================
-// TRIAL CHECK
-// =====================
-export function checkTrial() {
-  const trialEndsAt = localStorage.getItem("trialEndsAt");
-  const subStatus = localStorage.getItem("subscriptionStatus");
-  if (!trialEndsAt) return;
+  const text = await res.text();
 
-  const expiry = new Date(trialEndsAt);
-  const now = new Date();
-
-  if (now > expiry && subStatus !== "active") {
-    showToast("Your trial has ended. Please subscribe to continue.", "warning");
-    setTimeout(() => (window.location.href = "/subscribe.html"), 2000);
+  // Try to parse JSON safely
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    // HTML or other text → show fallback
+    toast("Server returned unexpected response", "error");
+    throw new Error("Invalid JSON from server");
   }
+
+  // Handle non-OK statuses
+  if (!res.ok) {
+    const msg = data.error || data.message || `Error ${res.status}`;
+    toast(msg, "error");
+    throw new Error(msg);
+  }
+
+  return data;
 }
 
 // =====================
-// LOADING SPINNER HELPER
+// LOADING BUTTON
 // =====================
-if (!document.querySelector("#spinner-style")) {
-  const style = document.createElement("style");
-  style.id = "spinner-style";
-  style.textContent = `
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(style);
-}
+export function setLoading(btn, state, restoreText) {
+  if (!btn) return;
 
-export function setLoading(button, isLoading, textWhenDone = null) {
-  if (!button) return;
-
-  if (isLoading) {
-    button.disabled = true;
-    button.dataset.originalText = button.innerHTML;
-    button.innerHTML = `
-      <span class="spinner" style="
-        border: 2px solid #fff;
-        border-top: 2px solid transparent;
-        border-radius: 50%;
-        width: 16px;
-        height: 16px;
-        display: inline-block;
-        margin-right: 6px;
-        animation: spin 0.6s linear infinite;
-        vertical-align: middle;
-      "></span> Processing...
-    `;
-
-    const reset = () => {
-      button.disabled = false;
-      button.innerHTML = button.dataset.originalText || textWhenDone || "Submit";
-    };
-    button._unloadHandler = reset;
-    window.addEventListener("beforeunload", reset);
-    window.addEventListener("pagehide", reset);
+  if (state) {
+    btn.disabled = true;
+    btn.dataset.old = btn.innerHTML;
+    btn.innerHTML = `<span style="
+      border: 2px solid #fff;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      animation: spin 0.6s linear infinite;
+    "></span>`;
   } else {
-    button.disabled = false;
-    button.innerHTML = button.dataset.originalText || textWhenDone || "Submit";
-    if (button._unloadHandler) {
-      window.removeEventListener("beforeunload", button._unloadHandler);
-      window.removeEventListener("pagehide", button._unloadHandler);
-      delete button._unloadHandler;
-    }
+    btn.disabled = false;
+    btn.innerHTML = restoreText || btn.dataset.old || "Submit";
   }
 }
