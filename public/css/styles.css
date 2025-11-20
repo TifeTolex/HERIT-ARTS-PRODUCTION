@@ -595,15 +595,14 @@ label:hover{
 input, select {
   width: 100%;
   padding: 0.6rem 0.8rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  /* border: 1px solid #ccc; */
+ 
   font-size: 1rem;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input:focus, select:focus {
-  border-color: #0F62FE;
-  color: #0F62FE;
+
   box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.15);
   outline: none;
 } 
@@ -613,6 +612,8 @@ input:focus, select:focus {
 .platform-grid {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: 1rem;
   margin-top: 0.8rem;
 }
