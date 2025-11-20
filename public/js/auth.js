@@ -26,14 +26,9 @@ if (signupForm) {
         body: JSON.stringify(data),
       });
 
-      // ✅ Immediately stop spinner before redirect
-      setLoading(btn, false);
-
       saveToken(token);
       localStorage.setItem('role', user.role);
-      if (user.trialEndsAt) {
-        localStorage.setItem('trialEndsAt', user.trialEndsAt);
-      }
+      if (user.trialEndsAt) localStorage.setItem('trialEndsAt', user.trialEndsAt);
 
       showToast('Signup successful!', 'success');
 
@@ -45,15 +40,13 @@ if (signupForm) {
           ? '/subscriptions.html'
           : '/dashboard.html';
 
-      // Small delay for smooth UX before redirect
-      setTimeout(() => {
-        window.location.href = redirectTo;
-      }, 600);
-
+      setTimeout(() => (window.location.href = redirectTo), 600);
       signupForm.reset();
-    } catch (e) {
+    } catch (err) {
+      setLoading(btn, false);
       document.getElementById('password').value = '';
-      showToast(e.message || 'Signup failed', 'error');
+      showToast(err.message || 'Signup failed', 'error');
+    } finally {
       setLoading(btn, false);
     }
   });
@@ -80,33 +73,21 @@ if (loginForm) {
         body: JSON.stringify(data),
       });
 
-      // ✅ Stop spinner *before* navigating
-      setLoading(btn, false);
-
       saveToken(token);
       localStorage.setItem('role', user.role);
-      if (user.trialEndsAt) {
-        localStorage.setItem('trialEndsAt', user.trialEndsAt);
-      }
+      if (user.trialEndsAt) localStorage.setItem('trialEndsAt', user.trialEndsAt);
 
-      // showToast('Login successful!', 'success');
+      showToast('Login successful!', 'success');
 
-      const redirectTo =
-        user.role === 'staff' ? '/staff.html' : '/dashboard.html';
-
-      setTimeout(() => {
-        window.location.href = redirectTo;
-      }, 600);
-
+      const redirectTo = user.role === 'staff' ? '/staff.html' : '/dashboard.html';
+      setTimeout(() => (window.location.href = redirectTo), 600);
       loginForm.reset();
-    } catch (e) {
-      // Fix: password field ID mismatch
-      const passInput =
-        document.getElementById('loginPassword') ||
-        document.getElementById('password');
+    } catch (err) {
+      setLoading(btn, false);
+      const passInput = document.getElementById('loginPassword') || document.getElementById('password');
       if (passInput) passInput.value = '';
-
-      showToast(e.message || 'Login failed', 'error');
+      showToast(err.message || 'Login failed', 'error');
+    } finally {
       setLoading(btn, false);
     }
   });
@@ -133,11 +114,11 @@ if (resetForm) {
         body: JSON.stringify({ email }),
       });
 
-      setLoading(btn, false);
       showToast('If the email exists, a reset link has been sent.', 'success');
       resetForm.reset();
     } catch (err) {
       showToast(err.message || 'Request failed', 'error');
+    } finally {
       setLoading(btn, false);
     }
   });
