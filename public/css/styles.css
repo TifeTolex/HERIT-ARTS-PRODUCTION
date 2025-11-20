@@ -542,10 +542,10 @@ form {
 
 /* Labels & Inputs */
 
-label {
+/* label {
   font-size: 0.9rem;
   color: var(--muted);
-}
+} */
 
 input,
 select,
@@ -586,8 +586,7 @@ label {
 } 
 
 label:hover{
-  /* border-color: #0F62FE; */
-  box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.15);
+
   outline: none;
 }
 
