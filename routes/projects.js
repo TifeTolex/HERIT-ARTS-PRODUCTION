@@ -5,7 +5,8 @@ import path from 'path';
 import fs from 'fs';
 import { requireAuth } from '../middleware/auth.js';
 import User from '../data/models/User.js';
-import Project from '..project.js'; // NEW
+import Project from "../data/models/project.js";
+
 
 const router = express.Router();
 

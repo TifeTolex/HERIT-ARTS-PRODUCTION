@@ -1,7 +1,7 @@
 // scripts/migrate-projects.js
 import mongoose from 'mongoose';
 import User from "../data/models/User.js";
-import Project from "../data/models/Project.js";
+import Project from "../data/models/project.js";
 
 const MONGO = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/yourdb';
 
