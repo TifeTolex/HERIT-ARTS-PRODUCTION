@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meet Our Productions</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #0d0d0d;
+    color: #f5f5f5;
+  }
+
+  header {
+    text-align: center;
+    padding: 4rem 1rem 2rem;
+    background: linear-gradient(90deg, #ff416c, #ff4b2b);
+    color: white;
+  }
+
+  header h1 {
+    font-size: 3rem;
+    margin: 0;
+    letter-spacing: 1px;
+  }
+
+  /* Filter Tabs */
+  .filters {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+  }
+
+  .filters button {
+    padding: 0.5rem 1.5rem;
+    border-radius: 2rem;
+    border: none;
+    background: #1a1a1a;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+
+  .filters button.active, .filters button:hover {
+    background: #ff4b2b;
+    color: #fff;
+  }
+
+  /* Gallery Grid */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 0 2rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: #111;
+  }
+
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+
+  .gallery-item:hover img {
+    transform: scale(1.05);
+  }
+
+  .gallery-item .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .gallery-item:hover .overlay {
+    opacity: 1;
+  }
+
+  .overlay h2 {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+
+  /* Modal */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 2rem;
+    overflow-y: auto;
+  }
+
+  .modal.active {
+    display: flex;
+  }
+
+  .modal-content {
+    background: #1a1a1a;
+    border-radius: 1rem;
+    max-width: 900px;
+    width: 100%;
+    padding: 2rem;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #fff;
+  }
+
+  .modal h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #ff4b2b;
+  }
+
+  .modal section {
+    margin-bottom: 1.5rem;
+  }
+
+  .modal section img {
+    max-width: 100%;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .modal iframe {
+    width: 100%;
+    height: 400px;
+    border-radius: 0.5rem;
+  }
+
+  .get-ticket {
+    display: block;
+    text-align: center;
+    margin: 2rem auto;
+    padding: 1rem 3rem;
+    background: #ff4b2b;
+    color: #fff;
+    font-size: 1.25rem;
+    text-decoration: none;
+    border-radius: 2rem;
+    transition: background 0.3s ease;
+  }
+
+  .get-ticket:hover {
+    background: #ff416c;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Meet Our Productions</h1>
+</header>
+
+<div class="filters">
+  <button class="active" data-filter="all">All</button>
+  <button data-filter="photo">Photos</button>
+  <button data-filter="video">Videos</button>
+  <button data-filter="resource">Resources</button>
+</div>
+
+<section class="gallery" id="gallery"></section>
+
+<a href="tickets.html" class="get-ticket">🎟 Get Tickets</a>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="modal-content" id="modalContent">
+    <span class="modal-close" id="modalClose">&times;</span>
+    <h2 id="modalTitle"></h2>
+    <section class="about" id="modalAbout"></section>
+    <section class="resources" id="modalResources"></section>
+    <section class="video" id="modalVideo"></section>
+  </div>
+</div>
+
+<script>
+  const productions = [
+    {
+      title: "Production One",
+      type: "photo",
+      image: "images/prod1.jpg",
+      about: "A captivating production showcasing creativity.",
+      resources: ["images/resource1.jpg", "images/resource2.jpg"],
+      video: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+    },
+    {
+      title: "Production Two",
+      type: "video",
+      image: "images/prod2.jpg",
+      about: "Breathtaking visuals with cinematic effects.",
+      resources: ["images/resource3.jpg"],
+      video: "https://www.youtube.com/embed/3JZ_D3ELwOQ"
+    },
+    // Add more production objects here
+  ];
+
+  const galleryEl = document.getElementById('gallery');
+  const modal = document.getElementById('modal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalAbout = document.getElementById('modalAbout');
+  const modalResources = document.getElementById('modalResources');
+  const modalVideo = document.getElementById('modalVideo');
+  const modalClose = document.getElementById('modalClose');
+
+  const filterButtons = document.querySelectorAll('.filters button');
+
+  function renderGallery(filter = 'all') {
+    galleryEl.innerHTML = '';
+    productions.filter(p => filter==='all' || p.type===filter).forEach(prod => {
+      const div = document.createElement('div');
+      div.classList.add('gallery-item');
+      div.innerHTML = `
+        <img src="${prod.image}" alt="${prod.title}">
+        <div class="overlay"><h2>${prod.title}</h2></div>
+      `;
+      div.addEventListener('click', () => openModal(prod));
+      galleryEl.appendChild(div);
+    });
+  }
+
+  function openModal(prod) {
+    modalTitle.textContent = prod.title;
+    modalAbout.innerHTML = `<h3>About</h3><p>${prod.about}</p>`;
+    modalResources.innerHTML = `<h3>Production Resources</h3>` + (prod.resources.map(r => `<img src="${r}" alt="Resource">`).join('') || 'No resources');
+    modalVideo.innerHTML = `<h3>Video</h3>` + (prod.video ? `<iframe src="${prod.video}" frameborder="0" allowfullscreen></iframe>` : 'No video available');
+    modal.classList.add('active');
+  }
+
+  modalClose.addEventListener('click', () => modal.classList.remove('active'));
+  modal.addEventListener('click', (e) => { if(e.target===modal) modal.classList.remove('active') });
+
+  filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGallery(btn.getAttribute('data-filter'));
+    });
+  });
+
+  renderGallery();
+</script>
+
+</body>
+</html>
