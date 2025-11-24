@@ -10,20 +10,23 @@ async function loadProject() {
   try {
     const { project } = await api(`/api/projects/${id}`);
 
-    // Project details
+    // Extract metadata safely
+    const m = project.metadata || {};
+
     details.innerHTML = `
-      <h3>${project.name || 'Untitled project'}</h3>
+      <h3>${project.name || 'Untitled Project'}</h3>
       <div><strong>Status:</strong> <span class="status ${String(project.status||'Pending').replace(/\s+/g,'')}">${project.status}</span></div>
       <div><strong>Deadline:</strong> ${project.deadline ? new Date(project.deadline).toLocaleDateString() : '—'}</div>
-      <div><strong>Goal:</strong> ${project.primaryGoal || project.goal || '—'}</div>
-      <div><strong>Features:</strong><br/>${(project.keyFeatures || project.features || '').replace(/\n/g,'<br/>')}</div>
-      <div><strong>Audience:</strong> ${(project.targetAudience || project.audience || []).join(', ') || '—'}</div>
-      <div><strong>Tone:</strong> ${(project.toneOfVoice || project.tones || []).join(', ') || '—'}</div>
-      <div><strong>Usage:</strong> ${(project.usage || []).join(', ') || '—'}</div>
-      <div><strong>Notes:</strong> ${project.notes || '—'}</div>
+      <div><strong>Content Type:</strong> ${project.contentType || m.contentType || '—'}</div>
+      <div><strong>Goal:</strong> ${project.goal || m.goal || '—'}</div>
+      <div><strong>Features:</strong><br/>${(project.features || m.features || '').replace(/\n/g,'<br/>')}</div>
+      <div><strong>Audience:</strong> ${(project.audience || m.audience || []).join(', ') || '—'}</div>
+      <div><strong>Tone:</strong> ${(project.tones || m.tones || []).join(', ') || '—'}</div>
+      <div><strong>Usage:</strong> ${(project.usage || m.usage || []).join(', ') || '—'}</div>
+      <div><strong>Notes:</strong> ${project.notes || m.notes || '—'}</div>
+      <div><strong>Assets:</strong> Colors: ${(m.assets?.colors || []).join(', ') || '—'}, Typography: ${m.assets?.typography || '—'}</div>
     `;
 
-    // Delivered files
     renderFiles(project.files || []);
   } catch (err) {
     toast('Failed to load project: ' + err.message, 'error');
@@ -76,7 +79,7 @@ document.getElementById('approveBtn')?.addEventListener('click', async () => {
 
 // Request changes
 document.getElementById('requestChangesBtn')?.addEventListener('click', async () => {
-  const notes = document.getElementById('reviewNotes').value;
+  const notes = document.getElementById('reviewNotes')?.value;
   try {
     await api(`/api/projects/${id}/changes`, { 
       method: 'POST', 

@@ -43,18 +43,26 @@ router.post('/', requireAuth, async (req, res) => {
     const user = req.user;
     if (!user.brand) return res.status(400).json({ error: 'Brand not found' });
 
-    const payload = {
-      externalId: Date.now().toString(36) + Math.random().toString(36).slice(2),
-      name: req.body.name || req.body.projectName || 'Untitled Project',
-      brief: req.body.brief || req.body.description || '',
-      requirements: req.body.requirements || '',
-      brand: user._id,
-      brandName: user.brand.businessName || user.brand.name || '',
-      brandEmail: user.email,
-      status: 'Pending',
-      deadline: req.body.deadline ? new Date(req.body.deadline) : undefined,
-      metadata: req.body.metadata || {}
-    };
+  const payload = {
+  externalId: Date.now().toString(36) + Math.random().toString(36).slice(2),
+  name: req.body.title || req.body.name || 'Untitled Project', // map title -> name
+  brief: req.body.brief || req.body.notes || '',              // map notes -> brief
+  requirements: req.body.features || req.body.requirements || '',
+  brand: user._id,
+  brandName: user.brand.businessName || user.brand.name || '',
+  brandEmail: user.email,
+  status: 'Pending',
+  deadline: req.body.deadline ? new Date(req.body.deadline) : undefined,
+  metadata: {
+    contentType: req.body.contentType,
+    goal: req.body.goal,
+    audience: req.body.audience,
+    tones: req.body.tones,
+    usage: req.body.usage,
+    assets: req.body.assets
+  }
+};
+
 
     const project = await Project.create(payload);
 
