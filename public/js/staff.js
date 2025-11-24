@@ -59,52 +59,52 @@ function renderProjects(list) {
   });
 }
 
-// =====================
-// STAFF PROJECT DETAIL
-// =====================
 async function loadProjectDetail() {
   const id = new URLSearchParams(location.search).get('id');
   try {
-    const p = await api(`/api/projects/admin/${id}`);
+    const { project: p } = await api(`/api/projects/admin/${id}`);
+
+    // Use metadata safely
+    const m = p.metadata || {};
+    const assets = m.assets || p.assets || {};
 
     // Brief tab
-  document.getElementById('tab-brief').innerHTML = `
-  <div class="brief-grid">
-    <div class="left-column">
-      <h3>${p.title || p.name}</h3>
-      <div><strong>Status:</strong> <span class="status ${String(p.status||'Pending').replace(/\s+/g,'')}">${p.status}</span></div>
-      <div><strong>Deadline:</strong> ${p.deadline ? new Date(p.deadline).toLocaleDateString() : '—'}</div>
-      <div><strong>Goal:</strong> ${p.primaryGoal || p.goal || '—'}</div>
-      <div><strong>Notes:</strong> ${p.notes || '—'}</div>
-    </div>
-    <div class="right-column">
-      <div><strong>Brand:</strong> ${p.brandEmail || p.brand?.name || '—'}</div>
-      <div><strong>Audience:</strong> ${(p.targetAudience || p.audience || []).join(', ') || '—'}</div>
-      <div><strong>Tone:</strong> ${(p.toneOfVoice || p.tones || []).join(', ') || '—'}</div>
-      <div><strong>Usage:</strong> ${(p.usage || []).join(', ') || '—'}</div>
-      <div><strong>Features:</strong> ${(p.keyFeatures || p.features || '').replace(/\n/g,'<br/>') || '—'}</div>
-    </div>
-  </div>
-`;
-
+    document.getElementById('tab-brief').innerHTML = `
+      <div class="brief-grid">
+        <div class="left-column">
+          <h3>${p.name || m.name || 'Untitled Project'}</h3>
+          <div><strong>Status:</strong> <span class="status ${String(p.status||'Pending').replace(/\s+/g,'')}">${p.status}</span></div>
+          <div><strong>Deadline:</strong> ${p.deadline ? new Date(p.deadline).toLocaleDateString() : '—'}</div>
+          <div><strong>Goal:</strong> ${p.goal || m.goal || '—'}</div>
+          <div><strong>Notes:</strong> ${p.notes || m.notes || '—'}</div>
+        </div>
+        <div class="right-column">
+          <div><strong>Brand:</strong> ${p.brandEmail || p.brand?.name || '—'}</div>
+          <div><strong>Audience:</strong> ${(p.audience || m.audience || []).join(', ') || '—'}</div>
+          <div><strong>Tone:</strong> ${(p.tones || m.tones || []).join(', ') || '—'}</div>
+          <div><strong>Usage:</strong> ${(p.usage || m.usage || []).join(', ') || '—'}</div>
+          <div><strong>Features:</strong> ${(p.features || m.features || '').replace(/\n/g,'<br/>') || '—'}</div>
+        </div>
+      </div>
+    `;
 
     // Assets tab
     document.getElementById('tab-assets').innerHTML = `
-      <div><strong>Logo:</strong> ${p.assets?.logo ? `<a class="btn ghost" download href="${p.assets.logo}">Download</a>` : '—'}</div>
-      <div><strong>Brand colors:</strong> ${(p.assets?.colors||[]).join(', ') || '—'}</div>
-      <div><strong>Typography:</strong> ${p.assets?.typography || '—'}</div>
-      <div><strong>Products:</strong> ${(p.assets?.products||[]).map(u=>`<a class="btn ghost" download href="${u}">File</a>`).join(' ') || '—'}</div>
+      <div><strong>Logo:</strong> ${assets.logo ? `<a class="btn ghost" download href="${assets.logo}">Download</a>` : '—'}</div>
+      <div><strong>Brand colors:</strong> ${(assets.colors||[]).join(', ') || '—'}</div>
+      <div><strong>Typography:</strong> ${assets.typography || '—'}</div>
+      <div><strong>Products:</strong> ${(assets.products||[]).map(u=>`<a class="btn ghost" download href="${u}">File</a>`).join(' ') || '—'}</div>
     `;
 
     // Notes tab
-    document.getElementById('tab-notes').innerHTML = p.notes || '<div class="text-muted">No notes</div>';
+    document.getElementById('tab-notes').innerHTML = p.notes || m.notes || '<div class="text-muted">No notes</div>';
 
     // Files tab
     document.getElementById('tab-files').innerHTML = (p.files && p.files.length)
       ? p.files.map(f => `
           <div class="row mt-1">
             <div>${f.originalName}</div>
-            <div class="text-muted">${new Date(f.uploadedAt).toLocaleString()}</div>
+            <div class="text-muted">${f.uploadedAt ? new Date(f.uploadedAt).toLocaleString() : ''}</div>
             <a class="btn ghost" download href="${f.url}">Download</a>
           </div>
         `).join('')
@@ -140,6 +140,7 @@ async function loadProjectDetail() {
         }
       });
     }
+
   } catch (err) {
     toast('Failed to load project: ' + err.message, 'error');
   }
