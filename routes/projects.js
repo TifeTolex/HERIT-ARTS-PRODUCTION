@@ -7,10 +7,9 @@ import { requireAuth } from '../middleware/auth.js';
 import User from '../data/models/User.js';
 import Project from "../data/models/project.js";
 
-
 const router = express.Router();
 
-// Multer setup (unchanged)
+// Multer setup
 const uploadDir = path.join(process.cwd(), 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
@@ -23,9 +22,22 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ---------------- Brand Routes ----------------
+// ------------------------------------------------------
+// UNIVERSAL PROJECT RESOLVER (MAIN FIX)
+// ------------------------------------------------------
+async function resolveProject(id, brandId = null) {
+  const query = {
+    $or: [{ externalId: id }, { _id: id }]
+  };
+  if (brandId) query.brand = brandId;
+  return await Project.findOne(query);
+}
 
-// Create project (brand creates -> new Project doc)
+// ------------------------------------------------------
+// BRAND ROUTES
+// ------------------------------------------------------
+
+// Create a project
 router.post('/', requireAuth, async (req, res) => {
   try {
     const user = req.user;
@@ -46,8 +58,6 @@ router.post('/', requireAuth, async (req, res) => {
 
     const project = await Project.create(payload);
 
-    // Optionally keep a reference in the User.brand.projects (compatibility)
-    // push minimal reference
     if (!user.brand.projects) user.brand.projects = [];
     user.brand.projects.push({
       id: project.externalId,
@@ -57,43 +67,59 @@ router.post('/', requireAuth, async (req, res) => {
     });
     await user.save();
 
-    res.json({ project });
+    res.json({
+      project: { ...project.toObject(), id: project._id.toString() }
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to create project' });
   }
 });
 
-// List my projects (from Projects collection)
+// List brand projects
 router.get('/', requireAuth, async (req, res) => {
   try {
     const projects = await Project.find({ brand: req.user._id }).sort({ createdAt: -1 }).lean();
-    res.json({ projects });
+
+    const formatted = projects.map(p => ({
+      ...p,
+      id: p._id.toString()
+    }));
+
+    res.json({ projects: formatted });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch projects' });
   }
 });
 
-// Get single project
+// Get single project (BRAND)
 router.get('/:id', requireAuth, async (req, res) => {
   try {
-    const project = await Project.findOne({ externalId: req.params.id, brand: req.user._id }).lean();
+    const project = await resolveProject(req.params.id, req.user._id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
-    res.json({ project });
+
+    res.json({
+      project: { ...project.toObject(), id: project._id.toString() }
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch project' });
   }
 });
 
-// Upload files to project (brand)
+// Upload files (BRAND)
 router.post('/:id/upload', requireAuth, upload.array('files'), async (req, res) => {
   try {
-    const project = await Project.findOne({ externalId: req.params.id, brand: req.user._id });
+    const project = await resolveProject(req.params.id, req.user._id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
 
-    if (!req.files?.length) return res.json({ files: project.files });
+    if (!req.files?.length) {
+      return res.json({ files: project.files });
+    }
 
     const newFiles = req.files.map(f => ({
       url: `/uploads/${f.filename}`,
@@ -104,71 +130,100 @@ router.post('/:id/upload', requireAuth, upload.array('files'), async (req, res) 
 
     project.files.push(...newFiles);
     await project.save();
-    res.json({ files: project.files, project });
+
+    res.json({
+      files: project.files,
+      project: { ...project.toObject(), id: project._id.toString() }
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to upload files' });
   }
 });
 
-// Approve / mark complete (brand)
+// Approve project
 router.post('/:id/approve', requireAuth, async (req, res) => {
   try {
-    const project = await Project.findOne({ externalId: req.params.id, brand: req.user._id });
+    const project = await resolveProject(req.params.id, req.user._id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
 
     project.status = 'Completed';
     await project.save();
-    res.json({ project });
+
+    res.json({
+      project: { ...project.toObject(), id: project._id.toString() }
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to approve project' });
   }
 });
 
-// Request changes (brand)
+// Brand requests changes
 router.post('/:id/changes', requireAuth, async (req, res) => {
   try {
-    const project = await Project.findOne({ externalId: req.params.id, brand: req.user._id });
+    const project = await resolveProject(req.params.id, req.user._id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
 
     project.status = 'In Progress';
     await project.save();
-    res.json({ project });
+
+    res.json({
+      project: { ...project.toObject(), id: project._id.toString() }
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to update project' });
   }
 });
 
-// ---------------- Admin / Staff Routes ----------------
+// ------------------------------------------------------
+// ADMIN / STAFF ROUTES
+// ------------------------------------------------------
 
-// List all projects for staff/admin
+// List all projects
 router.get('/admin/all', requireAuth, async (req, res) => {
   try {
-    // populate brand basic info
-    const projects = await Project.find().sort({ createdAt: -1 }).populate('brand', 'email brand').lean();
-    // normalize brandName/brandEmail
-    const out = projects.map(p => ({
+    const projects = await Project.find()
+      .sort({ createdAt: -1 })
+      .populate('brand', 'email brand')
+      .lean();
+
+    const formatted = projects.map(p => ({
       ...p,
+      id: p._id.toString(),
       brandEmail: p.brand?.email || p.brandEmail,
-      brandName: (p.brand?.brand?.businessName || p.brandName) || (p.brand?.brand?.name || p.brandName)
+      brandName: p.brand?.brand?.businessName || p.brand?.brand?.name || p.brandName
     }));
-    res.json({ projects: out });
+
+    res.json({ projects: formatted });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch all projects' });
   }
 });
 
-// Get single project by ID for staff/admin
+// Admin/staff get single project
 router.get('/admin/:id', requireAuth, async (req, res) => {
   try {
-    const project = await Project.findOne({ externalId: req.params.id }).populate('brand', 'email brand').lean();
+    const project = await resolveProject(req.params.id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
-    project.brandEmail = project.brand?.email || project.brandEmail;
-    project.brandName = project.brand?.brand?.businessName || project.brandName || project.brand?.brand?.name;
-    res.json({ project });
+
+    await project.populate('brand', 'email brand');
+
+    const out = {
+      ...project.toObject(),
+      id: project._id.toString(),
+      brandEmail: project.brand?.email,
+      brandName: project.brand?.brand?.businessName || project.brand?.brand?.name
+    };
+
+    res.json({ project: out });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch project' });
@@ -179,29 +234,34 @@ router.get('/admin/:id', requireAuth, async (req, res) => {
 router.post('/admin/:id/assign', requireAuth, async (req, res) => {
   try {
     const { email } = req.body;
-    const project = await Project.findOne({ externalId: req.params.id });
+    const project = await resolveProject(req.params.id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
 
     project.assignee = email;
     project.status = 'In Progress';
     await project.save();
 
-    // populate for response
-    await project.populate('brand', 'email brand').execPopulate?.() || null;
-    project.brandEmail = project.brand?.email || project.brandEmail;
-    project.brandName = project.brand?.brand?.businessName || project.brandName || project.brand?.brand?.name;
+    await project.populate('brand', 'email brand');
 
-    res.json({ project });
+    const out = {
+      ...project.toObject(),
+      id: project._id.toString(),
+      brandEmail: project.brand?.email,
+      brandName: project.brand?.brand?.businessName || project.brand?.brand?.name
+    };
+
+    res.json({ project: out });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to assign project' });
   }
 });
 
-// Deliver project with optional files (staff)
+// Staff deliver project
 router.post('/admin/:id/deliver', requireAuth, upload.array('files'), async (req, res) => {
   try {
-    const project = await Project.findOne({ externalId: req.params.id }).populate('brand');
+    const project = await resolveProject(req.params.id);
     if (!project) return res.status(404).json({ error: 'Project not found' });
 
     if (req.files?.length) {
@@ -218,8 +278,7 @@ router.post('/admin/:id/deliver', requireAuth, upload.array('files'), async (req
     project.deliveredAt = new Date();
     await project.save();
 
-    // Notify brand: ensure owner has notifications array
-    const owner = project.brand;
+    const owner = await User.findById(project.brand);
     if (owner) {
       owner.notifications = owner.notifications || [];
       owner.notifications.push({
@@ -233,33 +292,34 @@ router.post('/admin/:id/deliver', requireAuth, upload.array('files'), async (req
       await owner.save();
     }
 
-    // response prepare
-    const out = project.toObject();
-    out.brandEmail = owner?.email || out.brandEmail;
-    out.brandName = owner?.brand?.businessName || out.brandName || owner?.brand?.name;
+    res.json({
+      project: {
+        ...project.toObject(),
+        id: project._id.toString(),
+        brandEmail: owner?.email,
+        brandName: owner?.brand?.businessName || owner?.brand?.name
+      }
+    });
 
-    res.json({ project: out });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to deliver project' });
   }
 });
 
-// Admin analytics summary
+// Analytics
 router.get('/admin-analytics/summary', requireAuth, async (req, res) => {
   try {
     const totalProjects = await Project.countDocuments();
     const completed = await Project.countDocuments({ status: 'Completed' });
     const delivered = await Project.countDocuments({ status: 'Delivered' });
 
-    // active brands (distinct brand ids)
     const activeBrandsAgg = await Project.aggregate([
       { $group: { _id: '$brand' } },
       { $count: 'activeBrands' }
     ]);
     const activeBrands = activeBrandsAgg[0]?.activeBrands || 0;
 
-    // dummy revenue can be replaced by real pricing logic
     const revenue = totalProjects * 200;
 
     res.json({
@@ -269,6 +329,7 @@ router.get('/admin-analytics/summary', requireAuth, async (req, res) => {
       activeBrands,
       totalProjects
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch analytics' });

@@ -67,7 +67,8 @@ if (form) {
       });
 
       toast('Project created successfully!', 'success');
-      window.location.href = '/review.html?id=' + projectRes.project.id;
+window.location.href = '/review.html?id=' + projectRes.project._id;
+
 
     } catch (err) {
       toast(err.message || 'Failed to create project', 'error');
