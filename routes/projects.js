@@ -215,7 +215,7 @@ router.get('/admin/all', requireAuth, async (req, res) => {
   }
 });
 
-// Admin/staff get single project
+// Admin/staff get single project with brand files
 router.get('/admin/:id', requireAuth, async (req, res) => {
   try {
     const project = await resolveProject(req.params.id);
@@ -226,8 +226,15 @@ router.get('/admin/:id', requireAuth, async (req, res) => {
     const out = {
       ...project.toObject(),
       id: project._id.toString(),
-      brandEmail: project.brand?.email,
-      brandName: project.brand?.brand?.businessName || project.brand?.brand?.name
+      brandEmail: project.brand?.email || project.brandEmail,
+      brandName: project.brand?.brand?.businessName || project.brand?.brand?.name || project.brandName,
+      files: (project.files || []).map(f => ({
+        url: f.url,
+        originalName: f.originalName,
+        uploadedBy: f.uploadedBy,
+        uploadedAt: f.uploadedAt
+      })),
+      assets: project.assets || {}
     };
 
     res.json({ project: out });
