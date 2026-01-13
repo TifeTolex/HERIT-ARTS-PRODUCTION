@@ -28,7 +28,7 @@ if (signupForm) {
 
       saveToken(token);
       localStorage.setItem('role', user.role);
-      if (user.trialEndsAt) localStorage.setItem('trialEndsAt', user.trialEndsAt);
+      // if (user.trialEndsAt) localStorage.setItem('trialEndsAt', user.trialEndsAt);
 
       showToast('Signup successful!', 'success');
 
@@ -75,7 +75,7 @@ if (loginForm) {
 
       saveToken(token);
       localStorage.setItem('role', user.role);
-      if (user.trialEndsAt) localStorage.setItem('trialEndsAt', user.trialEndsAt);
+      // if (user.trialEndsAt) localStorage.setItem('trialEndsAt', user.trialEndsAt);
 
       showToast('Login successful!', 'success');
 
