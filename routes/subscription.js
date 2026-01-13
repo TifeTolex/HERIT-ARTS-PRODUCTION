@@ -15,7 +15,7 @@ router.get('/', requireAuth, async (req, res) => {
   // Keep the key but disable any trial checks
   const trialEndsAt = null;
 
-  res.json({ subscription, trialEndsAt });
+  res.json({ subscription });
 });
 
 export default router;

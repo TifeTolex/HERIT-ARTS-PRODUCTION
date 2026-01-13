@@ -146,19 +146,19 @@ export async function api(path, options = {}) {
 // =====================
 // TRIAL / SUBSCRIPTION CHECK
 // =====================
-export function checkTrial() {
-  const trialEndsAt = localStorage.getItem("trialEndsAt");
-  const subStatus = localStorage.getItem("subscriptionStatus");
-  if (!trialEndsAt) return;
+// export function checkTrial() {
+//   const trialEndsAt = localStorage.getItem("trialEndsAt");
+//   const subStatus = localStorage.getItem("subscriptionStatus");
+//   if (!trialEndsAt) return;
 
-  const expiry = new Date(trialEndsAt);
-  const now = new Date();
+//   const expiry = new Date(trialEndsAt);
+//   const now = new Date();
 
-  if (now > expiry && subStatus !== "active") {
-    toast("Your trial has ended. Please subscribe to continue.", "warning");
-    setTimeout(() => (window.location.href = "/subscribe.html"), 2000);
-  }
-}
+//   if (now > expiry && subStatus !== "active") {
+//     toast("Your trial has ended. Please subscribe to continue.", "warning");
+//     setTimeout(() => (window.location.href = "/subscribe.html"), 2000);
+//   }
+// }
 
 // =====================
 // LOADING SPINNER HELPER
