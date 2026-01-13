@@ -57,7 +57,7 @@ router.post('/signup', async (req, res) => {
     res.json({
       success: true,
       token: generateToken(user),
-      user: { id: user._id, email: user.email, role: user.role, trialEndsAt: user.trialEndsAt }
+      user: { id: user._id, email: user.email, role: user.role }
     });
   } catch (err) {
     console.error(err);
@@ -92,7 +92,7 @@ router.post('/staff-signup', async (req, res) => {
     res.json({
       success: true,
       token: generateToken(user),
-      user: { id: user._id, email: user.email, role: user.role, trialEndsAt: user.trialEndsAt }
+      user: { id: user._id, email: user.email, role: user.role }
     });
   } catch (err) {
     console.error(err);
@@ -120,7 +120,7 @@ router.post('/login', async (req, res) => {
     res.json({
       success: true,
       token: generateToken(user),
-      user: { id: user._id, email: user.email, role: user.role, trialEndsAt: user.trialEndsAt }
+      user: { id: user._id, email: user.email, role: user.role }
     });
   } catch (err) {
     console.error(err);
