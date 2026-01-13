@@ -11,7 +11,9 @@ router.get('/', requireAuth, async (req, res) => {
   if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
   const subscription = user.brand?.subscription || null;
-  const trialEndsAt = user.trialEndsAt || null;
+
+  // Keep the key but disable any trial checks
+  const trialEndsAt = null;
 
   res.json({ subscription, trialEndsAt });
 });
