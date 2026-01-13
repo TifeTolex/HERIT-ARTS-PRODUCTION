@@ -20,15 +20,20 @@ export async function requireAuth(req, res, next) {
 
     // Only block routes that require active subscription
     // e.g., /api/projects POST
-    if (req.path.startsWith('/projects') && req.method === 'POST') {
-      const now = new Date();
-      const hasActiveSub = user.brand?.subscription?.status === 'active';
-      const withinTrial = user.trialEndsAt && now <= new Date(user.trialEndsAt);
 
-      if (!hasActiveSub && !withinTrial) {
-        return res.status(402).json({ error: 'Trial expired. Please subscribe to continue.' });
-      }
-    }
+    // Subscription check temporarily disabled
+// All authenticated users can create projects
+
+
+    // if (req.path.startsWith('/projects') && req.method === 'POST') {
+    //   const now = new Date();
+    //   const hasActiveSub = user.brand?.subscription?.status === 'active';
+    //   const withinTrial = user.trialEndsAt && now <= new Date(user.trialEndsAt);
+
+    //   if (!hasActiveSub && !withinTrial) {
+    //     return res.status(402).json({ error: 'Trial expired. Please subscribe to continue.' });
+    //   }
+    // }
 
     return next();
   } catch (err) {
